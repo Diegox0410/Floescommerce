@@ -1,0 +1,510 @@
+/* =========================================================
+   SEARCH OVERLAY
+========================================================= */
+
+.search-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1200;
+}
+
+.search-overlay-backdrop {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    rgba(30, 13, 31, 0.5);
+
+  backdrop-filter:
+    blur(7px);
+}
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.search-panel {
+  position: relative;
+
+  width: min(
+    900px,
+    calc(100% - 40px)
+  );
+
+  max-height:
+    calc(100dvh - 80px);
+
+  margin:
+    40px auto;
+
+  overflow-y: auto;
+
+  border-radius:
+    28px;
+
+  background:
+    var(--dgng-white);
+
+  box-shadow:
+    0 40px 100px
+    rgba(35, 10, 39, 0.3);
+}
+
+/* =========================================================
+   TOP
+========================================================= */
+
+.search-panel-top {
+  min-height:
+    84px;
+
+  padding:
+    20px 28px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  border-bottom:
+    1px solid
+    var(--dgng-border);
+}
+
+.search-brand {
+  display: flex;
+
+  align-items:
+    center;
+
+  gap: 12px;
+}
+
+.search-brand > span {
+  width: 43px;
+  height: 43px;
+
+  display: grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    50%;
+
+  background:
+    var(--dgng-purple);
+
+  color: white;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    0.72rem;
+}
+
+.search-brand small {
+  color:
+    var(--dgng-muted);
+
+  font-size:
+    0.58rem;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.11em;
+}
+
+.search-close {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    var(--dgng-border);
+
+  border-radius:
+    50%;
+
+  background:
+    transparent;
+
+  color:
+    var(--dgng-purple-deep);
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   SEARCH INPUT
+========================================================= */
+
+.search-input-wrapper {
+  padding:
+    32px 30px;
+
+  display: flex;
+
+  align-items:
+    center;
+
+  gap: 18px;
+
+  border-bottom:
+    1px solid
+    var(--dgng-border);
+
+  color:
+    var(--dgng-purple);
+}
+
+.search-input-wrapper input {
+  flex: 1;
+
+  min-width: 0;
+
+  border: 0;
+
+  outline: 0;
+
+  background:
+    transparent;
+
+  color:
+    var(--dgng-ink);
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    clamp(
+      1.8rem,
+      4vw,
+      3.3rem
+    );
+
+  font-weight:
+    400;
+}
+
+.search-input-wrapper input::placeholder {
+  color:
+    #aaa0a7;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.search-content {
+  padding:
+    26px 30px
+    35px;
+}
+
+.search-results-header {
+  display: flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  padding-bottom:
+    12px;
+
+  color:
+    var(--dgng-pink);
+
+  font-size:
+    0.61rem;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.11em;
+}
+
+.search-results-header strong {
+  min-width:
+    24px;
+
+  height:
+    24px;
+
+  display: grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--dgng-cream-soft);
+
+  color:
+    var(--dgng-purple);
+}
+
+/* =========================================================
+   RESULTS
+========================================================= */
+
+.search-result {
+  min-height:
+    93px;
+
+  display: grid;
+
+  grid-template-columns:
+    65px
+    1fr
+    auto
+    25px;
+
+  align-items:
+    center;
+
+  gap: 18px;
+
+  border-top:
+    1px solid
+    var(--dgng-border);
+
+  transition:
+    padding 160ms ease,
+    background 160ms ease;
+}
+
+.search-result:hover {
+  padding:
+    0 12px;
+
+  background:
+    var(--dgng-cream);
+}
+
+.search-result-media {
+  width: 58px;
+  height: 67px;
+
+  display: grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    14px;
+
+  background:
+    var(--dgng-cream-soft);
+}
+
+.search-result-media span {
+  width: 27px;
+  height: 43px;
+
+  display: grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    13px 13px
+    6px 6px;
+
+  background:
+    var(--dgng-purple);
+
+  color: white;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    0.55rem;
+}
+
+.search-result-info small {
+  color:
+    var(--dgng-muted);
+
+  font-size:
+    0.58rem;
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    0.07em;
+
+  text-transform:
+    uppercase;
+}
+
+.search-result-info h3 {
+  margin:
+    5px 0 0;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    1.15rem;
+
+  font-weight:
+    400;
+}
+
+.search-result-price {
+  font-size:
+    0.79rem;
+
+  font-weight:
+    750;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.search-empty {
+  padding:
+    70px 20px;
+
+  text-align:
+    center;
+}
+
+.search-empty h3 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    1.7rem;
+
+  font-weight:
+    400;
+}
+
+.search-empty p {
+  color:
+    var(--dgng-muted);
+}
+
+/* =========================================================
+   ALL PRODUCTS
+========================================================= */
+
+.search-all-link {
+  min-height:
+    50px;
+
+  margin-top:
+    22px;
+
+  padding:
+    0 20px;
+
+  display: flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap: 9px;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--dgng-purple-deep);
+
+  color: white;
+
+  font-size:
+    0.76rem;
+
+  font-weight:
+    750;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+  max-width: 650px
+) {
+  .search-panel {
+    width: 100%;
+
+    height: 100dvh;
+
+    max-height:
+      none;
+
+    margin: 0;
+
+    border-radius:
+      0;
+  }
+
+  .search-panel-top {
+    padding:
+      16px 18px;
+  }
+
+  .search-input-wrapper {
+    padding:
+      26px 20px;
+  }
+
+  .search-content {
+    padding:
+      22px 20px
+      30px;
+  }
+
+  .search-result {
+    grid-template-columns:
+      58px
+      1fr
+      auto;
+  }
+
+  .search-result > svg {
+    display:
+      none;
+  }
+
+  .search-result-price {
+    font-size:
+      0.72rem;
+  }
+}
