@@ -8,17 +8,17 @@ export function BrandStatement() {
 
         <div className="brand-statement-copy">
           <span className="eyebrow">
-            TODO EN UN SOLO LUGAR
+            CONFECCIÓN FLOES
           </span>
 
           <h2>
-            Una tienda.
-            <span> Nuevos favoritos por descubrir.</span>
+            Diseños para trabajar.
+            <span> Modelos para sentirte tú.</span>
           </h2>
 
           <p>
-            Productos seleccionados, novedades y marcas importadas para
-            encontrar eso que buscas en un solo lugar.
+            Uniformes, textiles y confeccionados presentados como modelos,
+            con sus telas, colores y tallas en un catálogo claro.
           </p>
 
           <Link

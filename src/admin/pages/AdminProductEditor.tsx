@@ -52,6 +52,7 @@ import {
   money,
   number,
 } from "../components/format";
+import { TextileProductEditor } from "../components/TextileProductEditor";
 
 export function AdminProductEditor() {
   const { id } = useParams();
@@ -130,10 +131,6 @@ function ProductEditorForm({
   ] = useState(
     initial.images.join("\n"),
   );
-  const [colorsText, setColorsText] = useState((initial.colors ?? []).map((color) => color.hex ? `${color.name}|${color.hex}` : color.name).join("\n"));
-  const [sizesText, setSizesText] = useState((initial.sizes ?? []).join(", "));
-  const [variantsText, setVariantsText] = useState(JSON.stringify(initial.variants ?? [], null, 2));
-  const [sizeGuideText, setSizeGuideText] = useState(initial.sizeGuide ? JSON.stringify(initial.sizeGuide, null, 2) : "");
 
   const [error, setError] =
     useState("");
@@ -201,10 +198,10 @@ function ProductEditorForm({
                 value.trim(),
             )
             .filter(Boolean),
-        colors: colorsText.split(/\n|,/).map((value) => { const [name, hex] = value.split("|").map((part) => part.trim()); return { name, hex: hex || undefined }; }).filter((color) => color.name),
-        sizes: sizesText.split(/\n|,/).map((value) => value.trim()).filter(Boolean),
-        variants: variantsText.trim() ? JSON.parse(variantsText) : [],
-        sizeGuide: sizeGuideText.trim() ? JSON.parse(sizeGuideText) : undefined,
+        colors: (form.colors ?? []).filter((color) => color.name.trim()).map((color) => ({ ...color, name: color.name.trim(), hex: color.hex?.trim() || undefined })),
+        sizes: (form.sizes ?? []).map((size) => size.trim()).filter(Boolean),
+        variants: form.variants ?? [],
+        sizeGuide: form.sizeGuide,
       };
 
       if (
@@ -567,28 +564,10 @@ function ProductEditorForm({
               <Field label="Audiencia"><select value={form.audience ?? ""} onChange={(event) => updateField("audience", (event.target.value || undefined) as ProductInput["audience"])}><option value="">Sin definir</option><option value="mujer">Mujer</option><option value="hombre">Hombre</option><option value="unisex">Unisex</option><option value="infantil">Infantil</option><option value="otro">Otro</option></select></Field>
               <Field label="Tela"><input value={form.fabric ?? ""} onChange={(event) => updateField("fabric", event.target.value)} /></Field>
               <Field label="Material"><input value={form.material ?? ""} onChange={(event) => updateField("material", event.target.value)} /></Field>
-              <Field label="Colores (nombre|#hex, uno por línea)"><textarea rows={4} value={colorsText} onChange={(event) => setColorsText(event.target.value)} /></Field>
-              <Field label="Tallas (separadas por coma)"><input value={sizesText} onChange={(event) => setSizesText(event.target.value)} /></Field>
             </div>
           </section>
 
-          <section className="admin-card admin-form-section">
-            <h2>Variantes</h2>
-            <p className="admin-footnote">Cada combinación mantiene SKU, precio/costo opcionales, stock, mínimo y estado. El formato JSON permite editar atributos adicionales sin limitar el dominio textil.</p>
-            <button type="button" className="admin-secondary-button" onClick={() => {
-              const colors = colorsText.split(/\n|,/).map((value) => value.split("|")[0].trim()).filter(Boolean);
-              const sizes = sizesText.split(/\n|,/).map((value) => value.trim()).filter(Boolean);
-              const combinations = (colors.length ? colors : [undefined]).flatMap((color) => (sizes.length ? sizes : [undefined]).map((size) => ({ id: crypto.randomUUID(), sku: [form.sku || "FLO", color, size].filter(Boolean).join("-").toUpperCase().replace(/\s+/g, "-"), color, size, stock: 0, minimumStock: 0, active: true })));
-              setVariantsText(JSON.stringify(combinations, null, 2));
-            }}>Generar combinaciones talla-color</button>
-            <Field label="Variantes (JSON)"><textarea rows={14} value={variantsText} onChange={(event) => setVariantsText(event.target.value)} spellCheck={false} /></Field>
-          </section>
-
-          <section className="admin-card admin-form-section">
-            <h2>Guía de tallas</h2>
-            <p className="admin-footnote">Usa columnas flexibles y filas con etiqueta y valores. Ejemplo: {`{"columns":["XS","S"],"rows":[{"label":"Busto","values":["92","96"]}]}`}</p>
-            <Field label="Tabla de medidas (JSON)"><textarea rows={10} value={sizeGuideText} onChange={(event) => setSizeGuideText(event.target.value)} spellCheck={false} /></Field>
-          </section>
+          <TextileProductEditor sku={form.sku} colors={form.colors ?? []} sizes={form.sizes ?? []} variants={form.variants ?? []} sizeGuide={form.sizeGuide} onColorsChange={(value) => updateField("colors", value)} onSizesChange={(value) => updateField("sizes", value)} onVariantsChange={(value) => updateField("variants", value)} onSizeGuideChange={(value) => updateField("sizeGuide", value)} />
 
           <section className="admin-card admin-form-section">
             <h2>

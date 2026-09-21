@@ -1934,6 +1934,25 @@
   text-transform: uppercase;
 }
 .model-collection-section { padding: 110px 0; background: #fbfaf6; }
+.floes-hero { --hero-image: none; position: relative; min-height: min(860px, calc(100svh - 110px)); overflow: hidden; display: grid; place-items: center; background: linear-gradient(145deg,#e6e2d7 0%,#9bb0a1 52%,#173f35 160%); isolation: isolate; }
+.floes-hero.has-image::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: var(--hero-image); background-position: center; background-size: cover; }
+.floes-hero-overlay { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 42%,rgba(255,255,255,.22),transparent 42%),linear-gradient(180deg,rgba(16,45,38,.1),rgba(16,45,38,.46)); }
+.floes-hero-inner { min-height: inherit; padding-block: 90px 48px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; color: white; }
+.floes-hero-kicker { font-size: .68rem; font-weight: 800; letter-spacing: .32em; }
+.floes-hero h1 { margin: 24px 0 14px; font: 400 clamp(7rem,21vw,19rem)/.72 Georgia,serif; letter-spacing: -.075em; }
+.floes-hero p { max-width: 470px; margin: 30px auto 0; font: 400 clamp(1.15rem,2vw,1.65rem)/1.4 Georgia,serif; }
+.floes-hero-action { margin-top: 34px; min-height: 52px; padding: 0 24px; display: inline-flex; align-items: center; border-radius: 999px; background: white; color: var(--green-950); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.floes-hero-scroll { margin-top: auto; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; }
+.model-collection-section.collection-1 { background: #ece9df; }
+.model-collection-section.collection-2 { background: #dce5dc; }
+.ecuador-section { padding: 140px 0; background: #e9e0ce; }
+.ecuador-grid { display: grid; grid-template-columns: .7fr 1.3fr; align-items: center; gap: 10vw; }
+.ecuador-mark { min-height: 420px; display: grid; place-items: center; border-radius: 50% 50% 28px 28px; background: linear-gradient(145deg,#173f35,#386a5b); color: rgba(255,255,255,.82); font: 400 clamp(5rem,10vw,10rem)/1 Georgia,serif; }
+.ecuador-grid h2 { max-width: 650px; margin: 14px 0 24px; font: 400 clamp(3.4rem,6vw,6.4rem)/.94 Georgia,serif; letter-spacing: -.055em; }
+.ecuador-grid p { max-width: 520px; color: #59675f; font-size: 1rem; line-height: 1.75; }
+.ecuador-grid a { display: inline-block; margin-top: 28px; padding-bottom: 5px; border-bottom: 1px solid currentColor; font-size: .82rem; font-weight: 700; }
+@media (max-width: 800px) { .floes-hero { min-height: 720px; } .ecuador-grid { grid-template-columns: 1fr; gap: 45px; } .ecuador-mark { min-height: 360px; } }
+@media (max-width: 480px) { .floes-hero { min-height: 650px; } .floes-hero h1 { font-size: clamp(5.4rem,29vw,8rem); } .floes-hero-inner { padding-top: 75px; } .ecuador-section { padding: 80px 0; } .ecuador-mark { min-height: 280px; } }
 .model-collection-heading { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 44px; }
 .model-collection-heading h2, .materials-section h2 { max-width: 760px; margin: 10px 0 0; font: 400 clamp(2.8rem,5vw,5.3rem)/.98 Georgia,serif; letter-spacing: -.045em; }
 .model-collection-heading > a { padding-bottom: 5px; border-bottom: 1px solid currentColor; font-size: .82rem; font-weight: 700; }

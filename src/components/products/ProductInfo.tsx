@@ -25,7 +25,7 @@ export function ProductInfo({
         </span>
       )}
 
-      <h1>{product.name}</h1>
+      <h2 className="product-info-name">{product.name}</h2>
 
       <div className="product-detail-price">
         <strong>

@@ -63,6 +63,11 @@ export function ProductDetail() {
           Volver al catálogo
         </Link>
 
+        <header className="product-editorial-header">
+          <span>{[displayProduct.productType, displayProduct.category, displayProduct.collection].filter(Boolean).join(" · ")}</span>
+          <h1>{displayProduct.name}</h1>
+        </header>
+
         <section className="product-detail-layout">
 
           <ProductGallery

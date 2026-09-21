@@ -81,7 +81,7 @@ export function ProductCard({
         </Link>
 
         <div className="product-footer">
-          <div className="product-pricing">
+          {price > 0 && <div className="product-pricing">
             <strong>
               ${price.toFixed(2)}
             </strong>
@@ -97,7 +97,7 @@ export function ProductCard({
                 ).toFixed(2)}
               </span>
             )}
-          </div>
+          </div>}
 
           {product.variants.length ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
             className="product-add-button"
