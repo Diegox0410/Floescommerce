@@ -79,7 +79,7 @@ export const useStoreConfigStore = create<StoreConfigState>()(
         }),
     }),
     {
-      name: "dgng-store-config",
+      name: "floes-store-config",
       version: 2,
       partialize: (state) => ({
         config: state.config,

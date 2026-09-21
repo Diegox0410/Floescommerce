@@ -129,7 +129,7 @@ export const useCheckoutStore =
       }),
       {
         name:
-          "dgng-last-order",
+          "floes-last-order",
         version: 2,
 
         partialize: (

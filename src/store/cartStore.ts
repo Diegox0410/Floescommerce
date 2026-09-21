@@ -175,7 +175,7 @@ export const useCartStore = create<CartStore>()(
         })),
     }),
     {
-      name: "commerce-builder-cart",
+      name: "floes-cart",
       merge: (persisted, current) => {
         const state=record(persisted);
         const entries=Array.isArray(state.items)?state.items:[];

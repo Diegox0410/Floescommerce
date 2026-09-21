@@ -142,7 +142,7 @@ export const useCategoryStore = create<CategoryState>()(
         }),
     }),
     {
-      name: "dgng-categories",
+      name: "floes-categories",
       version: 2,
 
       /*

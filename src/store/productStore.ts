@@ -546,7 +546,7 @@ export const useProductStore =
       }),
 
       {
-        name: "dgng-products",
+        name: "floes-products",
 
         version: 2,
 
