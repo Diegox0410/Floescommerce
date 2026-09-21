@@ -16,7 +16,7 @@ export function ProductInfo({
   return (
     <div className="product-detail-info">
       <span className="product-detail-category">
-        {product.brand || product.category}
+        {[product.category, product.collection].filter(Boolean).join(" · ")}
       </span>
 
       {product.badge && (
@@ -44,6 +44,8 @@ export function ProductInfo({
           product.description ||
           "Producto diseñado y seleccionado para ti."}
       </p>
+
+      {(product.fabric || product.material) && <div className="product-textile-meta"><span>Tela / material</span><strong>{product.fabric || product.material}</strong></div>}
 
       <div className="product-detail-divider" />
 

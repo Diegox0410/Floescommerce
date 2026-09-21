@@ -238,7 +238,7 @@ export function Checkout() {
 
     try {
       const current = useProductStore.getState().products;
-      const snapshots = items.map(({ product, quantity }) => {
+      const snapshots = items.map(({ product, quantity, variant }) => {
         const latest = current.find((p) => p.id === product.id);
         if (
           !latest ||
@@ -248,13 +248,22 @@ export function Checkout() {
           throw new Error(
             `${product.name} ya no está disponible. Retíralo del carrito.`,
           );
+        const latestVariant = variant ? latest.variants.find((entry) => entry.id === variant.id && entry.active) : undefined;
+        if (variant && (!latestVariant || latestVariant.stock < quantity)) throw new Error(`${product.name}: la variante seleccionada ya no está disponible.`);
         return {
           productId: latest.id,
           name: latest.name,
-          sku: latest.sku,
-          price: promotionalPrice(latest, promotions),
-          cost: getProductRealCost(latest),
+          sku: latestVariant?.sku ?? latest.sku,
+          price: latestVariant?.price ?? promotionalPrice(latest, promotions),
+          cost: latestVariant?.productCost ?? getProductRealCost(latest),
           quantity,
+          variantId: latestVariant?.id,
+          variantSku: latestVariant?.sku,
+          variantLabel: latestVariant ? [latestVariant.color, latestVariant.size].filter(Boolean).join(" / ") : undefined,
+          size: latestVariant?.size,
+          color: latestVariant?.color,
+          measurement: latestVariant?.measurement,
+          material: latestVariant?.material,
         };
       });
       const now = new Date().toISOString();

@@ -71,8 +71,7 @@ export function ProductCard({
 
       <div className="product-content">
         <span className="product-category">
-          {product.brand ||
-            product.category}
+          {[product.collection, product.category].filter(Boolean).join(" · ")}
         </span>
 
         <Link
@@ -100,7 +99,7 @@ export function ProductCard({
             )}
           </div>
 
-          <button
+          {product.variants.length ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
             className="product-add-button"
             type="button"
             onClick={handleAddToCart}
@@ -111,7 +110,7 @@ export function ProductCard({
             <span>
               Agregar al carrito
             </span>
-          </button>
+          </button>}
         </div>
       </div>
     </article>

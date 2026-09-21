@@ -318,6 +318,9 @@ export const useOrderStore =
                     productId:
                       item.productId,
 
+                    variantId:
+                      item.variantId,
+
                     type:
                       "out",
 
@@ -371,6 +374,9 @@ export const useOrderStore =
                   (item) => ({
                     productId:
                       item.productId,
+
+                    variantId:
+                      item.variantId,
 
                     type:
                       "in",

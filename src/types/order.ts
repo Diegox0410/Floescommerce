@@ -27,6 +27,13 @@ export interface OrderItem {
   price: number;
   cost: number;
   quantity: number;
+  variantId?: string;
+  variantSku?: string;
+  variantLabel?: string;
+  size?: string;
+  color?: string;
+  measurement?: string;
+  material?: string;
 }
 export interface Order {
   id: string;

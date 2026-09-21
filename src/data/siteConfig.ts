@@ -2,7 +2,7 @@ export const siteConfig = {
   brand: {
     name: "FLOES",
     fullName: "FLOES.ec",
-    tagline: "Más que productos, un estilo de vida.",
+    tagline: "Confección para salud, belleza y bienestar.",
     logo: "/images/brand/dgng-logo.jpg",
     cover: "/images/brand/dgng-cover.jpg",
   },
@@ -30,12 +30,12 @@ export const siteConfig = {
       href: "/catalogo",
     },
     {
-      label: "Cuidado personal",
-      href: "/catalogo?categoria=cuidado-personal",
+      label: "Uniformes",
+      href: "/catalogo?categoria=uniformes",
     },
     {
-      label: "Bienestar",
-      href: "/catalogo?categoria=bienestar",
+      label: "Sábanas",
+      href: "/catalogo?categoria=sabanas",
     },
     {
       label: "Ofertas",

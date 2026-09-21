@@ -86,6 +86,11 @@ export function ProductDetail() {
 
         </section>
 
+        {displayProduct.sizeGuide && <section className="size-guide-section" aria-labelledby="size-guide-title">
+          <div><span className="eyebrow">MEDIDAS DEL MODELO</span><h2 id="size-guide-title">{displayProduct.sizeGuide.title || "Guía de tallas"}</h2>{displayProduct.sizeGuide.note && <p>{displayProduct.sizeGuide.note}</p>}</div>
+          <div className="size-guide-scroll"><table><thead><tr><th>Medida</th>{displayProduct.sizeGuide.columns.map((column) => <th key={column}>{column}</th>)}</tr></thead><tbody>{displayProduct.sizeGuide.rows.map((row) => <tr key={row.label}><th>{row.label}</th>{displayProduct.sizeGuide!.columns.map((column, index) => <td key={column}>{row.values[index] || "—"}</td>)}</tr>)}</tbody></table></div>
+        </section>}
+
       </div>
 
     </main>

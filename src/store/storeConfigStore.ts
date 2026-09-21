@@ -8,7 +8,7 @@ export const defaultStoreConfig: StoreConfig = {
   social: { instagram: { enabled: false, url: "" }, facebook: { enabled: false, url: "" }, tiktok: { enabled: false, url: "" } },
   commerce: { currency: "USD", country: "Ecuador", shippingEnabled: true, shippingText: "Envíos nacionales por Servientrega", shippingMode: "pending", shippingCost: 0, whatsappPurchaseEnabled: true, webCheckoutEnabled: true, paymentMethods: { transfer: true, cash: true } },
   seo: { siteTitle: "FLOES.ec - Confección para salud, belleza y bienestar", siteDescription: "Uniformes, textiles y productos confeccionados para salud, belleza y bienestar en Ecuador.", keywords: "FLOES, uniformes, confeccion, textiles, salud, belleza, Ecuador" },
-  announcement: { enabled: true, text: "CONFECCIÓN HECHA EN ECUADOR 🇺🇸", linkText: "Ver catálogo", href: "/catalogo" },
+  announcement: { enabled: true, text: "CONFECCIÓN HECHA EN ECUADOR", linkText: "Ver catálogo", href: "/catalogo" },
   navigation: [
     { id: "home", label: "Inicio", href: "/", enabled: true, sortOrder: 0 },
     { id: "catalog", label: "Catálogo", href: "/catalogo", enabled: true, sortOrder: 1 },
