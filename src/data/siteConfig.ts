@@ -44,7 +44,7 @@ export const siteConfig = {
   ],
 
   social: {
-    instagram: "#",
+    instagram: "https://www.instagram.com/floes.ec/",
     facebook: "#",
     tiktok: "#",
   },

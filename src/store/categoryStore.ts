@@ -4,15 +4,11 @@ import type { Category } from "../types/category";
 import { slugify } from "../utils/normalization";
 
 const categoryNames = [
-  "Fragancias y brumas",
-  "Cuidado labial",
-  "Kits corporales",
-  "Exfoliación corporal",
-  "Hidratación y cuidado corporal",
-  "Baño e higiene",
-  "Cuidado capilar",
-  "Brillo corporal",
-  "Línea infantil",
+  "Uniformes",
+  "Sábanas",
+  "Cintillos",
+  "Accesorios",
+  "Otros confeccionados",
 ];
 
 export const defaultCategories: Category[] = categoryNames.map(
