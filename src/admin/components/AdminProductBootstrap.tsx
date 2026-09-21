@@ -97,7 +97,7 @@ export function AdminProductBootstrap({
       <div className="admin-bootstrap-state">
         <div className="admin-bootstrap-card">
           <span className="admin-eyebrow">
-            DGNG ADMIN
+            FLOES ADMIN
           </span>
 
           <h2>
@@ -140,7 +140,7 @@ export function AdminProductBootstrap({
       <div className="admin-bootstrap-state">
         <div className="admin-bootstrap-card">
           <span className="admin-eyebrow">
-            DGNG ADMIN
+            FLOES ADMIN
           </span>
 
           <h2>

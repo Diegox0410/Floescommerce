@@ -40,11 +40,11 @@ export function normalizeProduct(value: unknown): Product {
   const now = new Date().toISOString();
   return {
     id: text(p.id, crypto.randomUUID()),
-    sku: text(p.sku, `DGNG-${text(p.id, "LEGACY")}`),
+    sku: text(p.sku, `FLO-${text(p.id, "LEGACY")}`),
     slug: text(p.slug, slugify(text(p.name))),
     name: text(p.name, "Producto demo"),
     category: text(p.category, "Sin categoría"),
-    brand: text(p.brand, "DGNG Demo"),
+    brand: text(p.brand, "FLOES"),
     description: text(
       p.description,
       "Producto seleccionado para complementar tu rutina de cuidado y bienestar.",
@@ -101,7 +101,7 @@ export function normalizeOrder(value: unknown): Order {
         ? null
         : safeNumber(o.shippingCost);
   const order: Order = {
-    id: text(o.id, `DGNG-${crypto.randomUUID()}`),
+    id: text(o.id, `FLOES-${crypto.randomUUID()}`),
     createdAt: text(o.createdAt, now),
     updatedAt: text(o.updatedAt, now),
     customerId: text(o.customerId) || undefined,

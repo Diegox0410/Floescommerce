@@ -88,7 +88,7 @@ export function Checkout() {
 
   /*
    * Todavía no conocemos las tarifas
-   * definitivas de DGNG.
+   * definitivas de FLOES.
    *
    * Más adelante esto vendrá de:
    * Admin → Configuración → Envíos.
@@ -259,7 +259,7 @@ export function Checkout() {
       });
       const now = new Date().toISOString();
       const order: StoreOrder = {
-        id: `DGNG-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+        id: `FLOES-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
         createdAt: now,
         updatedAt: now,
         customer: { ...form.customer },

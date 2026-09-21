@@ -37,7 +37,7 @@ export function HeroSection() {
         <div className="hero-media">
           <img
             src="/images/brand/Feed-home.png"
-            alt="Productos importados disponibles en DGNG Store"
+            alt="Confecciones y productos de FLOES.ec"
             className="hero-feed-image"
           />
         </div>

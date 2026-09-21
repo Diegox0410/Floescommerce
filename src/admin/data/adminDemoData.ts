@@ -18,7 +18,7 @@ import type {
 } from "../types/admin";
 export const adminUser: AdminUser = {
   id: "owner",
-  name: "Administrador DGNG",
+  name: "Administrador FLOES",
   role: "OWNER",
 };
 export const dashboardKpis: AdminKpi[] = [

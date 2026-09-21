@@ -31,7 +31,7 @@ export function AdminAuthGuard({
     return (
       <div className="admin-auth">
         <div className="admin-auth-card">
-          <span className="eyebrow">DGNG ADMIN</span>
+          <span className="eyebrow">FLOES ADMIN</span>
           <h1>Verificando acceso...</h1>
         </div>
       </div>

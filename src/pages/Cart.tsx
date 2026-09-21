@@ -356,7 +356,7 @@ export function Cart() {
 
                 <div>
                   <strong>
-                    Atención DGNG
+                    Atención FLOES
                   </strong>
 
                   <span>

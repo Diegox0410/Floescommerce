@@ -48,7 +48,7 @@ export function ProductCatalogBootstrap({
           );
 
         console.error(
-          "DGNG catalog bootstrap:",
+          "FLOES catalog bootstrap:",
           error,
         );
       }

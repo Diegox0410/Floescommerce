@@ -3,12 +3,12 @@ import { persist } from "zustand/middleware";
 import type { StoreConfig } from "../types/storeConfig";
 
 export const defaultStoreConfig: StoreConfig = {
-  identity: { name: "DGNG Store", shortName: "DGNG", tagline: "Importados de USA", logo: "/images/brand/dgng-logo.png", colors: { primary: "#173f35", secondary: "#f2eee6", accent: "#bd8b4b", background: "#fffdf9" } },
-  contact: { whatsapp: "0939932625", whatsappMessage: "🛍️✨ ¡Hola, DGNG Store! Visité su tienda online y me gustaría recibir más información sobre sus productos. 💜 ¿Me pueden ayudar, por favor? 😊", email: "", city: "Guayaquil", country: "Ecuador" },
+  identity: { name: "FLOES.ec", shortName: "FLOES", tagline: "Confección para salud, belleza y bienestar", logo: "/images/brand/dgng-logo.png", colors: { primary: "#173f35", secondary: "#f2eee6", accent: "#bd8b4b", background: "#fffdf9" } },
+  contact: { whatsapp: "", whatsappMessage: "🛍️✨ ¡Hola, FLOES.ec! Visité su tienda online y me gustaría recibir más información sobre sus productos. 💜 ¿Me pueden ayudar, por favor? 😊", email: "", city: "Guayaquil", country: "Ecuador" },
   social: { instagram: { enabled: false, url: "" }, facebook: { enabled: false, url: "" }, tiktok: { enabled: false, url: "" } },
   commerce: { currency: "USD", country: "Ecuador", shippingEnabled: true, shippingText: "Envíos nacionales por Servientrega", shippingMode: "pending", shippingCost: 0, whatsappPurchaseEnabled: true, webCheckoutEnabled: true, paymentMethods: { transfer: true, cash: true } },
-  seo: { siteTitle: "DGNG Store | Importados de USA", siteDescription: "Productos seleccionados e importados de USA para Ecuador.", keywords: "DGNG, importados, Ecuador" },
-  announcement: { enabled: true, text: "PRODUCTOS IMPORTADOS DE USA 🇺🇸", linkText: "Ver catálogo", href: "/catalogo" },
+  seo: { siteTitle: "FLOES.ec - Confección para salud, belleza y bienestar", siteDescription: "Uniformes, textiles y productos confeccionados para salud, belleza y bienestar en Ecuador.", keywords: "FLOES, uniformes, confeccion, textiles, salud, belleza, Ecuador" },
+  announcement: { enabled: true, text: "CONFECCIÓN HECHA EN ECUADOR 🇺🇸", linkText: "Ver catálogo", href: "/catalogo" },
   navigation: [
     { id: "home", label: "Inicio", href: "/", enabled: true, sortOrder: 0 },
     { id: "catalog", label: "Catálogo", href: "/catalogo", enabled: true, sortOrder: 1 },
@@ -18,18 +18,18 @@ export const defaultStoreConfig: StoreConfig = {
     sections: [
       { id: "hero", type: "hero", enabled: true, sortOrder: 0 },
       { id: "categories", type: "categories", enabled: true, sortOrder: 1 },
-      { id: "featured-products", type: "featured-products", enabled: true, sortOrder: 2, title: "Productos para sentirte bien.", description: "Explora una selección de productos importados.", limit: 4 },
+      { id: "featured-products", type: "featured-products", enabled: true, sortOrder: 2, title: "Productos para sentirte bien.", description: "Explora una selección de productos confeccionados para ti.", limit: 4 },
       { id: "brand-statement", type: "brand-statement", enabled: true, sortOrder: 3 },
       { id: "campaign", type: "campaign", enabled: true, sortOrder: 4 },
       { id: "best-sellers", type: "best-sellers", enabled: true, sortOrder: 5, title: "Favoritos que vuelven siempre.", description: "Descubre los productos preferidos de nuestra comunidad.", limit: 4 },
       { id: "benefits", type: "benefits", enabled: true, sortOrder: 6 },
       { id: "social", type: "social", enabled: true, sortOrder: 7 },
     ],
-    hero: { enabled: true, eyebrow: "IMPORTADOS DE USA", title: "Descubre algo nuevo.", description: "Productos seleccionados, novedades y favoritos importados para encontrar eso que buscas en un solo lugar.", primaryButtonLabel: "Ver catálogo", primaryButtonHref: "/catalogo", secondaryButtonLabel: "Explorar categorías", secondaryButtonHref: "#categorias", image: "/images/brand/dgng-cover.jpg" },
-    campaign: { enabled: true, eyebrow: "SELECCIÓN DGNG", title: "Productos para descubrir.", description: "Explora novedades y precios especiales seleccionados para ti.", image: "", buttonLabel: "Ver ofertas", buttonHref: "/catalogo?filter=ofertas" },
+    hero: { enabled: true, eyebrow: "CONFECCIÓN ECUATORIANA", title: "Descubre algo nuevo.", description: "Diseños confeccionados para profesionales de salud, belleza y bienestar, con opciones pensadas para cada necesidad.", primaryButtonLabel: "Ver catálogo", primaryButtonHref: "/catalogo", secondaryButtonLabel: "Explorar categorías", secondaryButtonHref: "#categorias", image: "/images/brand/dgng-cover.jpg" },
+    campaign: { enabled: true, eyebrow: "SELECCIÓN FLOES", title: "Productos para descubrir.", description: "Explora novedades y precios especiales seleccionados para ti.", image: "", buttonLabel: "Ver ofertas", buttonHref: "/catalogo?filter=ofertas" },
     benefits: [
       { id: "shipping", title: "Envíos a todo Ecuador", description: "Coordinamos tu entrega de forma clara.", iconKey: "truck", enabled: true },
-      { id: "selected", title: "Productos seleccionados", description: "Una selección cuidada de importados.", iconKey: "sparkles", enabled: true },
+      { id: "selected", title: "Productos seleccionados", description: "Una selección cuidada de diseños y productos.", iconKey: "sparkles", enabled: true },
       { id: "support", title: "Atención personalizada", description: "Te ayudamos antes y después de comprar.", iconKey: "message", enabled: true },
       { id: "easy", title: "Compra fácil", description: "Elige cómo completar tu pedido.", iconKey: "bag", enabled: true },
     ],

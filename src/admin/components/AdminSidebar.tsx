@@ -14,8 +14,8 @@ export function AdminSidebar({
   return (
     <>
       <div className="admin-sidebar-brand">
-        <Link to="/admin" onClick={onNavigate} aria-label="DGNG Admin">
-          <strong>DGNG</strong>
+        <Link to="/admin" onClick={onNavigate} aria-label="FLOES Admin">
+          <strong>FLOES</strong>
           <span>ADMIN</span>
         </Link>
         <button

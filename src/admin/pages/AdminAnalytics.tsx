@@ -28,7 +28,7 @@ export function AdminAnalytics() {
       <AdminSectionHeader
         eyebrow="ADMIN / INTELIGENCIA COMERCIAL"
         title="Analítica"
-        description="Observa cómo evoluciona DGNG y dónde se genera el resultado."
+        description="Observa cómo evoluciona FLOES y dónde se genera el resultado."
       />
       <PeriodSelector value={period} onChange={setPeriod} analyticsOnly />
       <SalesPolicyNote />

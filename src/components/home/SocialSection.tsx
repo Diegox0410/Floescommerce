@@ -29,12 +29,12 @@ export function SocialSection() {
       <div className="container dgng-social-layout">
 
         <header className="dgng-social-header">
-          <span className="eyebrow">CONECTA CON DGNG</span>
+          <span className="eyebrow">CONECTA CON FLOES</span>
 
           <h2>Síguenos</h2>
 
           <p>
-            Descubre novedades, productos y contenido de DGNG Store.
+            Descubre novedades, productos y contenido de FLOES.ec.
           </p>
         </header>
 

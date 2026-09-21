@@ -30,7 +30,7 @@ export function WhatsAppCTA({
   const resolvedMessage =
     message ||
     (productName
-      ? `🛍️✨ ¡Hola, DGNG Store! Vi el producto "${productName}" en su tienda online y me gustaría recibir más información sobre disponibilidad y compra. 💜 ¿Me pueden ayudar, por favor? 😊`
+      ? `🛍️✨ ¡Hola, FLOES.ec! Vi el producto "${productName}" en su tienda online y me gustaría recibir más información sobre disponibilidad y compra. 💜 ¿Me pueden ayudar, por favor? 😊`
       : config.contact
           .whatsappMessage);
 

@@ -29,7 +29,7 @@ export function BenefitsSection() {
     <section className="benefits-section dgng-benefits">
       <div className="container">
         <header className="dgng-benefits-header">
-          <span className="eyebrow">POR QUÉ DGNG</span>
+          <span className="eyebrow">POR QUÉ FLOES</span>
 
           <h2>Comprar fácil, elegir mejor.</h2>
         </header>

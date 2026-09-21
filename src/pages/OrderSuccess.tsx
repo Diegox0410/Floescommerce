@@ -44,7 +44,7 @@ export function OrderSuccess() {
       .join(", ");
 
   const whatsappMessage =
-    `🛍️✨ ¡Hola, DGNG Store! Acabo de registrar el pedido ${order.id}. ` +
+    `🛍️✨ ¡Hola, FLOES.ec! Acabo de registrar el pedido ${order.id}. ` +
     `Soy ${order.customer.firstName} ${order.customer.lastName}. ` +
     `Productos: ${itemsSummary}. ` +
     `Total provisional: $${order.total.toFixed(2)}. ` +
@@ -86,7 +86,7 @@ export function OrderSuccess() {
         <p className="order-success-copy">
           Hemos registrado la
           información de tu pedido.
-          DGNG podrá continuar con la
+          FLOES podrá continuar con la
           confirmación del pago y la
           coordinación de la entrega.
         </p>

@@ -1,7 +1,7 @@
 export const siteConfig = {
   brand: {
-    name: "DGNG",
-    fullName: "DGNG Store",
+    name: "FLOES",
+    fullName: "FLOES.ec",
     tagline: "Más que productos, un estilo de vida.",
     logo: "/images/brand/dgng-logo.jpg",
     cover: "/images/brand/dgng-cover.jpg",
@@ -9,14 +9,14 @@ export const siteConfig = {
 
   announcement: {
     enabled: true,
-    text: "Productos importados de USA",
+    text: "Confección hecha en Ecuador",
     linkText: "Ver catálogo",
     href: "/catalogo",
   },
 
   store: {
     country: "Ecuador",
-    origin: "Importados de USA",
+    origin: "Confección nacional",
     currency: "USD",
   },
 

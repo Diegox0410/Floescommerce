@@ -480,7 +480,7 @@ const mapRawRow = (
       cellText(
         mapped.brand,
       ) ||
-      "DGNG Store",
+      "FLOES.ec",
 
     description:
       cellText(

@@ -35,12 +35,12 @@ export function AdminLogin() {
           <LockKeyhole size={26} />
         </div>
 
-        <span className="eyebrow">DGNG ADMIN</span>
+        <span className="eyebrow">FLOES ADMIN</span>
 
         <h1>Acceso administrativo</h1>
 
         <p>
-          Inicia sesión con la cuenta autorizada para administrar DGNG Store.
+          Inicia sesión con la cuenta autorizada para administrar FLOES.ec.
         </p>
 
         <form onSubmit={handleSubmit} className="admin-auth-form">

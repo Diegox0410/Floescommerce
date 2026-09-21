@@ -48,7 +48,7 @@ export const adminNavigation = [
     path: "clientes",
     title: "Clientes",
     icon: Users,
-    description: "Conoce a tus clientes, su historial y su relación con DGNG.",
+    description: "Conoce a tus clientes, su historial y su relación con FLOES.",
     features: ["Perfiles de clientes", "Historial de compras", "Segmentos"],
   },
   {
@@ -108,7 +108,7 @@ export const adminNavigation = [
     title: "Configuración",
     icon: Settings,
     description:
-      "Centraliza las preferencias de DGNG y la información del propietario.",
+      "Centraliza las preferencias de FLOES y la información del propietario.",
     features: [
       "Información del negocio",
       "Preferencias del panel",

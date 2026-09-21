@@ -22,7 +22,7 @@ export function AdminFinance() {
       <AdminSectionHeader
         eyebrow="ADMIN / INTELIGENCIA COMERCIAL"
         title="Finanzas"
-        description="Entiende cuánto vende DGNG, cuánto cuesta operar y cuánto realmente genera."
+        description="Entiende cuánto vende FLOES, cuánto cuesta operar y cuánto realmente genera."
       />
       <PeriodSelector
         value={period}

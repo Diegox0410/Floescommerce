@@ -42,7 +42,7 @@ export function ProductInfo({
       <p className="product-detail-description">
         {product.shortDescription ||
           product.description ||
-          "Producto seleccionado e importado para ti."}
+          "Producto diseñado y seleccionado para ti."}
       </p>
 
       <div className="product-detail-divider" />

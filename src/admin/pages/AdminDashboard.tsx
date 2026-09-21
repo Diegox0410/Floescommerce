@@ -79,7 +79,7 @@ export function AdminDashboard() {
       <AdminSectionHeader
         eyebrow="RESUMEN EJECUTIVO / DATOS LOCALES"
         title="Buenos días"
-        description="Así va DGNG hoy."
+        description="Así va FLOES hoy."
         action={
           <span className="admin-period">
             <CalendarDays size={17} />

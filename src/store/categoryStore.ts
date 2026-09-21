@@ -148,7 +148,7 @@ export const useCategoryStore = create<CategoryState>()(
       /*
        * V1 contenía las cuatro categorías demo.
        * La migración V2 instala la taxonomía
-       * real del catálogo DGNG.
+       * real del catálogo FLOES.
        */
       migrate: () => ({
         categories:

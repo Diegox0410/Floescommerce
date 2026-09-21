@@ -35,7 +35,7 @@ export function BrandStatement() {
           <div className="statement-card statement-card-main">
             <img
               src="/images/brand/Section-especial.png"
-              alt="Selección especial de productos DGNG Store"
+              alt="Selección especial de productos FLOES.ec"
               className="statement-card-image"
             />
 
@@ -43,7 +43,7 @@ export function BrandStatement() {
 
             <img
               src="/images/brand/dgng-logo.png"
-              alt="DGNG Store"
+              alt="FLOES.ec"
               className="statement-card-logo"
             />
 
@@ -51,7 +51,7 @@ export function BrandStatement() {
               <span>Selección especial</span>
 
               <strong>
-                Importados que se adaptan a ti.
+                Diseños que se adaptan a ti.
               </strong>
             </div>
           </div>

@@ -351,7 +351,7 @@ export function AdminLayout() {
                   </main>
 
                   <footer className="admin-footer">
-                    DGNG ADMIN
+                    FLOES ADMIN
 
                     <span>
                       Tu negocio, con
