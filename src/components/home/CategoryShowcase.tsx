@@ -5,5 +5,6 @@ export function CategoryShowcase() {
   const featuredCategories = activeCategories(categories).filter(
     (category) => category.featured,
   );
-  return <section className="categories-section" id="categorias"><div className="container"><header className="section-heading"><span className="eyebrow">EXPLORA</span><h2>Categorías</h2><Link to="/catalogo">Ver todo</Link></header><div className="categories-grid">{featuredCategories.map((category) => <Link key={category.id} to={`/catalogo?categoria=${category.slug}`} className="category-card">{category.image && <img src={category.image} alt="" loading="lazy" />}<div><h3>{category.name}</h3><p>{category.description}</p></div></Link>)}</div></div></section>;
+  if (!featuredCategories.length) return null;
+  return <section className="categories-section" id="categorias"><div className="container"><header className="section-heading"><div><span className="eyebrow">UNIVERSO FLOES</span><h2>Categorías para cada profesión.</h2></div><Link to="/catalogo">Ver catálogo</Link></header><div className="categories-grid">{featuredCategories.map((category, index) => <Link key={category.id} to={`/catalogo?categoria=${category.slug}`} className={`category-card category-card-${index + 1}`}>{category.image && <img src={category.image} alt={category.name} loading="lazy" />}<div><span>0{index + 1}</span><h3>{category.name}</h3><p>{category.description}</p><strong>Explorar</strong></div></Link>)}</div></div></section>;
 }

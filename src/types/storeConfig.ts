@@ -14,6 +14,7 @@ export interface StoreConfig {
   home: {
     sections: HomeSection[];
     hero: { enabled: boolean; eyebrow: string; title: string; description: string; primaryButtonLabel: string; primaryButtonHref: string; secondaryButtonLabel?: string; secondaryButtonHref?: string; image: string; mobileImage?: string };
+    brandStory: { eyebrow: string; title: string; description: string; image: string; imageAlt: string; buttonLabel: string; buttonHref: string };
     campaign: { enabled: boolean; eyebrow: string; title: string; description: string; image: string; buttonLabel: string; buttonHref: string };
     benefits: { id: string; title: string; description: string; iconKey: string; enabled: boolean }[];
   };

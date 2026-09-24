@@ -53,6 +53,8 @@ import {
   number,
 } from "../components/format";
 import { TextileProductEditor } from "../components/TextileProductEditor";
+import { ProductImagesEditor } from "../components/ProductImagesEditor";
+import { activeCategories, useCategoryStore } from "../../store/categoryStore";
 
 export function AdminProductEditor() {
   const { id } = useParams();
@@ -125,13 +127,6 @@ function ProductEditorForm({
           : "",
     });
 
-  const [
-    extraImages,
-    setExtraImages,
-  ] = useState(
-    initial.images.join("\n"),
-  );
-
   const [error, setError] =
     useState("");
 
@@ -140,6 +135,8 @@ function ProductEditorForm({
 
   const navigate =
     useNavigate();
+
+  const categories = useCategoryStore((state) => activeCategories(state.categories));
 
   const upsertRemoteProduct =
     useProductStore(
@@ -190,14 +187,7 @@ function ProductEditorForm({
             form.name,
           ),
 
-        images:
-          extraImages
-            .split(/\n|,/)
-            .map(
-              (value) =>
-                value.trim(),
-            )
-            .filter(Boolean),
+        images: (form.images ?? []).map((value) => value.trim()).filter(Boolean),
         colors: (form.colors ?? []).filter((color) => color.name.trim()).map((color) => ({ ...color, name: color.name.trim(), hex: color.hex?.trim() || undefined })),
         sizes: (form.sizes ?? []).map((size) => size.trim()).filter(Boolean),
         variants: form.variants ?? [],
@@ -484,10 +474,13 @@ function ProductEditorForm({
                 "Marca",
               )}
 
-              {textField(
-                "category",
-                "Categoría",
-              )}
+              <Field label="Categoría">
+                <select required value={form.category} onChange={(event) => updateField("category", event.target.value)}>
+                  <option value="">Selecciona una categoría</option>
+                  {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
+                  {form.category && !categories.some((category) => category.name === form.category) && <option value={form.category}>{form.category}</option>}
+                </select>
+              </Field>
 
               {textField(
                 "shortDescription",
@@ -683,63 +676,7 @@ function ProductEditorForm({
             )}
           </section>
 
-          <section className="admin-card admin-form-section">
-            <h2>
-              Imágenes
-            </h2>
-
-            {textField(
-              "image",
-              "URL principal",
-            )}
-
-            <div
-              className="admin-product-image-preview"
-              aria-live="polite"
-            >
-              {form.image ? (
-                <img
-                  src={
-                    form.image
-                  }
-                  alt={`Vista previa de ${
-                    form.name ||
-                    "producto"
-                  }`}
-                />
-              ) : (
-                <span>
-                  La vista previa
-                  aparecerá cuando
-                  ingreses una URL.
-                </span>
-              )}
-            </div>
-
-            <Field label="URLs adicionales (una por línea)">
-              <textarea
-                rows={3}
-                value={
-                  extraImages
-                }
-                onChange={(
-                  event,
-                ) =>
-                  setExtraImages(
-                    event.target
-                      .value,
-                  )
-                }
-              />
-            </Field>
-
-            <p className="admin-footnote">
-              Puedes usar una URL
-              externa o una ruta
-              pública como
-              /images/products/producto.jpeg.
-            </p>
-          </section>
+          <ProductImagesEditor name={form.name} primary={form.image} gallery={form.images ?? []} onPrimaryChange={(value) => updateField("image", value || undefined)} onGalleryChange={(value) => updateField("images", value)} />
         </div>
 
         <aside className="admin-card admin-calculation">

@@ -6,7 +6,7 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebase";
 
-export const OWNER_UID = "cJzyRw8DGZbH3tTUQU73L5jS6bj2";
+export const OWNER_UID = import.meta.env.VITE_OWNER_UID;
 
 export const loginOwner = async (email: string, password: string) => {
   const credential = await signInWithEmailAndPassword(

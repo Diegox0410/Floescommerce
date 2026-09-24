@@ -2,18 +2,56 @@ import { Link } from "react-router-dom";
 import { ProductCard } from "../products/ProductCard";
 import { useProductStore } from "../../store/productStore";
 
-export function ModelCollections() {
-  const products = useProductStore((state) => state.products.filter((product) => product.active));
+const useActiveProducts = () => {
+  const products = useProductStore((state) => state.products);
+  return products.filter((product) => product.active);
+};
+
+function CollectionSection({ eyebrow, title, products, id, tone = 0 }: {
+  eyebrow: string;
+  title: string;
+  products: ReturnType<typeof useActiveProducts>;
+  id?: string;
+  tone?: number;
+}) {
+  if (!products.length) return null;
+  return <section className={`model-collection-section collection-${tone % 3}`} id={id}>
+    <div className="container">
+      <header className="model-collection-heading">
+        <div><span className="eyebrow">{eyebrow}</span><h2>{title}</h2></div>
+        <Link to="/catalogo">Ver modelos</Link>
+      </header>
+      <div className="model-collection-grid">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+    </div>
+  </section>;
+}
+
+export function NewModels() {
+  const products = useActiveProducts();
+  const recent = [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 4);
+  return <CollectionSection id="nuevos-modelos" eyebrow="NUEVOS MODELOS" title="Conoce lo más reciente de FLOES." products={recent} />;
+}
+
+export function AudienceCollections() {
+  const products = useActiveProducts();
   const groups = [
-    { id: "new", eyebrow: "NUEVOS MODELOS", title: "Diseños recién incorporados.", items: [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 4) },
-    { id: "women", eyebrow: "UNIFORMES MUJER", title: "Siluetas para mujer.", items: products.filter((product) => product.category === "Uniformes" && product.audience === "mujer").slice(0, 4) },
-    { id: "men", eyebrow: "UNIFORMES HOMBRE", title: "Modelos para hombre.", items: products.filter((product) => product.category === "Uniformes" && product.audience === "hombre").slice(0, 4) },
-    ...["Sábanas", "Cintillos", "Accesorios", "Otros confeccionados"].map((category) => ({ id: category, eyebrow: category.toUpperCase(), title: `Explora ${category.toLowerCase()}.`, items: products.filter((product) => product.category === category).slice(0, 4) })),
-  ].filter((group) => group.items.length);
-  const materials = [...new Set(products.flatMap((product) => [product.fabric, product.material]).filter(Boolean))] as string[];
-  if (!groups.length && !materials.length) return null;
-  return <>{groups.map((group, index) => <section className={`model-collection-section collection-${index % 3}`} id={group.id === "new" ? "nuevos-modelos" : undefined} key={group.id}><div className="container"><header className="model-collection-heading"><div><span className="eyebrow">{group.eyebrow}</span><h2>{group.title}</h2></div><Link to="/catalogo">Ver modelos</Link></header><div className="model-collection-grid">{group.items.map((product) => <ProductCard key={product.id} product={product} />)}</div></div></section>)}
-    {materials.length > 0 && <section className="materials-section"><div className="container"><span className="eyebrow">NUESTRAS TELAS</span><h2>Materiales definidos para cada modelo.</h2><div className="materials-list">{materials.map((material) => <span key={material}>{material}</span>)}</div></div></section>}
-    <section className="ecuador-section"><div className="container ecuador-grid"><div className="ecuador-mark" aria-hidden="true">EC</div><div><span className="eyebrow">HECHO EN ECUADOR</span><h2>Confección con identidad propia.</h2><p>Confección pensada para acompañar el trabajo, el bienestar y la identidad de cada cliente.</p><Link to="/catalogo">Conocer los modelos</Link></div></div></section>
-  </>;
+    { audience: "mujer", eyebrow: "MUJER", title: "Siluetas pensadas para ella." },
+    { audience: "hombre", eyebrow: "HOMBRE", title: "Modelos pensados para él." },
+    { audience: "unisex", eyebrow: "UNISEX", title: "Diseños para cada jornada." },
+  ] as const;
+  return <>{groups.map((group, index) => <CollectionSection key={group.audience} eyebrow={group.eyebrow} title={group.title} products={products.filter((product) => product.audience === group.audience).slice(0, 4)} tone={index + 1} />)}</>;
+}
+
+export function MaterialsSection() {
+  const products = useActiveProducts();
+  const materials = [...new Set(products.flatMap((product) => [product.fabric, product.material]).filter((value): value is string => Boolean(value?.trim())))];
+  if (!materials.length) return null;
+  return <section className="materials-section"><div className="container materials-layout">
+    <div><span className="eyebrow">NUESTRAS TELAS</span><h2>Materiales registrados para cada modelo.</h2></div>
+    <div className="materials-list">{materials.map((material, index) => <span key={material}><small>0{index + 1}</small>{material}</span>)}</div>
+  </div></section>;
+}
+
+export function ModelCollections() {
+  return <><NewModels /><AudienceCollections /><MaterialsSection /></>;
 }

@@ -27,7 +27,7 @@ export function ProductInfo({
 
       <h2 className="product-info-name">{product.name}</h2>
 
-      <div className="product-detail-price">
+      {product.price > 0 && <div className="product-detail-price">
         <strong>
           ${product.price.toFixed(2)}
         </strong>
@@ -37,29 +37,26 @@ export function ProductInfo({
             ${product.oldPrice.toFixed(2)}
           </span>
         )}
-      </div>
+      </div>}
 
       <p className="product-detail-description">
         {product.shortDescription ||
           product.description ||
-          "Producto diseñado y seleccionado para ti."}
+          ""}
       </p>
 
       {(product.fabric || product.material) && <div className="product-textile-meta"><span>Tela / material</span><strong>{product.fabric || product.material}</strong></div>}
 
-      <div className="product-detail-divider" />
-
+      {commerce.shippingEnabled && commerce.shippingText && <><div className="product-detail-divider" />
       <div className="product-detail-meta">
         <div>
           <span>Envíos</span>
 
           <strong>
-            {commerce.shippingEnabled
-              ? commerce.shippingText
-              : "Coordinar entrega"}
+            {commerce.shippingText}
           </strong>
         </div>
-      </div>
+      </div></>}
     </div>
   );
 }
