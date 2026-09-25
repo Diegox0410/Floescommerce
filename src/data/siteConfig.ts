@@ -3,8 +3,8 @@ export const siteConfig = {
     name: "FLOES",
     fullName: "FLOES.ec",
     tagline: "Confección para salud, belleza y bienestar.",
-    logo: "/images/brand/dgng-logo.jpg",
-    cover: "/images/brand/dgng-cover.jpg",
+    logo: "",
+    cover: "",
   },
 
   announcement: {

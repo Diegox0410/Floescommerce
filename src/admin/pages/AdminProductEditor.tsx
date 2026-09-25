@@ -206,7 +206,7 @@ function ProductEditorForm({
           ),
 
         images: (form.images ?? []).map((value) => value.trim()).filter(Boolean),
-        colors: (form.colors ?? []).filter((color) => color.name.trim()).map((color) => ({ ...color, name: color.name.trim(), hex: color.hex?.trim() || undefined })),
+        colors: (form.colors ?? []).filter((color) => color.name.trim()).map((color) => ({ ...color, name: color.name.trim(), hex: color.hex?.trim() || undefined, images: (color.images ?? []).map((image) => image.trim()).filter(Boolean) })),
         sizes: (form.sizes ?? []).map((size) => size.trim()).filter(Boolean),
         variants: form.variants ?? [],
         sizeGuide: form.sizeGuide,

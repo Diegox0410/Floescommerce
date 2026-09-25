@@ -1294,6 +1294,10 @@
 .textile-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
 .textile-editor-heading p { margin: 6px 0 0; color: var(--admin-muted); font-size: 13px; }
 .textile-guide-title { display: block; margin-bottom: 16px; }
+.textile-color-gallery { grid-column: 2 / -1; display: grid; gap: 8px; margin-top: 4px; }
+.textile-color-gallery > span { color: var(--admin-muted); font-size: 12px; }
+.textile-color-gallery label { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.textile-color-gallery button { width: auto; min-height: 34px; }
 .textile-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .admin-inline-action { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--admin-border); border-radius: 10px; background: white; cursor: pointer; font-size: 12px; font-weight: 700; }
 .textile-color-list { display: grid; gap: 10px; }

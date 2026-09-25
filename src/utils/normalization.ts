@@ -39,7 +39,11 @@ const normalizeColors = (value: unknown): ProductColor[] =>
   (Array.isArray(value) ? value : []).map((entry) => {
     if (typeof entry === "string") return { name: entry };
     const item = record(entry);
-    return { name: text(item.name), hex: text(item.hex) || undefined };
+    return {
+      name: text(item.name),
+      hex: text(item.hex) || undefined,
+      images: strings(item.images),
+    };
   }).filter((color) => color.name);
 const normalizeVariants = (value: unknown): ProductVariant[] =>
   (Array.isArray(value) ? value : []).map((entry) => {

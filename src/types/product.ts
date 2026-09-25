@@ -3,6 +3,8 @@ export type ProductAudience = "mujer" | "hombre" | "unisex" | "infantil" | "otro
 export interface ProductColor {
   name: string;
   hex?: string;
+  /** Optional gallery shown when this color is selected. */
+  images?: string[];
 }
 
 export interface ProductVariant {

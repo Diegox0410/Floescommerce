@@ -35,13 +35,6 @@ import type {
   StoreOrder,
 } from "../types/order";
 
-const normalizePlace = (value: string) =>
-  value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-
 const initialForm: CheckoutFormData = {
   customer: {
     firstName: "",
@@ -76,11 +69,6 @@ export function Checkout() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [processing, setProcessing] = useState(false);
-
-  const isGuayaquil =
-    normalizePlace(
-      form.shipping.city,
-    ) === "guayaquil";
 
   const subtotal = useMemo(() => getCartSubtotal(items), [items]);
 
@@ -131,21 +119,11 @@ export function Checkout() {
         [field]: value,
       };
 
-      const cashStillAllowed =
-        normalizePlace(
-          nextShipping.city,
-        ) === "guayaquil";
-
       return {
         ...current,
         shipping:
           nextShipping,
-        paymentMethod:
-          current.paymentMethod ===
-            "cash" &&
-          !cashStillAllowed
-            ? "transfer"
-            : current.paymentMethod,
+        paymentMethod: current.paymentMethod,
       };
     });
 
@@ -192,15 +170,6 @@ export function Checkout() {
 
     if (!form.shipping.address.trim()) {
       nextErrors.address = "Ingresa la dirección.";
-    }
-
-    if (
-      form.paymentMethod ===
-        "cash" &&
-      !isGuayaquil
-    ) {
-      nextErrors.payment =
-        "El pago en efectivo está disponible únicamente para entregas en Guayaquil.";
     }
 
     if (

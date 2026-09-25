@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import type { StoreConfig } from "../types/storeConfig";
 
 export const defaultStoreConfig: StoreConfig = {
-  identity: { name: "FLOES.ec", shortName: "FLOES", tagline: "Confección que viste tu profesión", logo: "", colors: { primary: "#173d36", secondary: "#eee7dc", accent: "#9a5c3f", background: "#f8f5ef" } },
+  identity: { name: "FLOES.ec", shortName: "FLOES", tagline: "Confección para salud, belleza y bienestar", logo: "", colors: { primary: "#173d36", secondary: "#eee7dc", accent: "#9a5c3f", background: "#f8f5ef" } },
   contact: { whatsapp: "", whatsappMessage: "🛍️✨ ¡Hola, FLOES.ec! Visité su tienda online y me gustaría recibir más información sobre sus productos. 💜 ¿Me pueden ayudar, por favor? 😊", email: "", city: "Guayaquil", country: "Ecuador" },
   social: { instagram: { enabled: true, url: "https://www.instagram.com/floes.ec/", handle: "@floes.ec" }, facebook: { enabled: false, url: "" }, tiktok: { enabled: false, url: "" } },
   commerce: { currency: "USD", country: "Ecuador", shippingEnabled: false, shippingText: "", shippingMode: "pending", shippingCost: 0, whatsappPurchaseEnabled: false, webCheckoutEnabled: true, paymentMethods: { transfer: false, cash: false } },
