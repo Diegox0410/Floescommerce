@@ -16,7 +16,7 @@ export function ProductInfo({
   return (
     <div className="product-detail-info">
       <span className="product-detail-category">
-        {[product.category, product.collection].filter(Boolean).join(" · ")}
+        {[product.productType, product.category, product.collection, product.audience].filter(Boolean).join(" · ")}
       </span>
 
       {product.badge && (
@@ -25,7 +25,7 @@ export function ProductInfo({
         </span>
       )}
 
-      <h2 className="product-info-name">{product.name}</h2>
+      <h1 className="product-info-name">{product.name}</h1>
 
       {product.price > 0 && <div className="product-detail-price">
         <strong>

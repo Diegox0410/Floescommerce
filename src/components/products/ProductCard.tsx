@@ -80,6 +80,22 @@ export function ProductCard({
           <h3>{product.name}</h3>
         </Link>
 
+        {product.colors.some((color) => color.hex) && (
+          <div className="product-color-preview" aria-label={`Colores disponibles para ${product.name}`}>
+            {product.colors.filter((color) => color.hex).slice(0, 5).map((color) => (
+              <span
+                key={`${product.id}:${color.name}`}
+                className="product-color-dot"
+                style={{ backgroundColor: color.hex }}
+                title={color.name}
+              />
+            ))}
+            {product.colors.filter((color) => color.hex).length > 5 && (
+              <small>+{product.colors.filter((color) => color.hex).length - 5}</small>
+            )}
+          </div>
+        )}
+
         <div className="product-footer">
           {price > 0 && <div className="product-pricing">
             <strong>
