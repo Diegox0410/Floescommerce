@@ -1,5 +1,6 @@
 import {
   useState,
+  useMemo,
   type FormEvent,
 } from "react";
 import {
@@ -67,6 +68,16 @@ export function AdminProductEditor() {
       ),
   );
 
+  /*
+   * El editor nuevo no debe construir un producto distinto cada vez que
+   * el componente padre se renderiza. Además de evitar UUIDs efímeros,
+   * esto mantiene estable el valor inicial que recibe ProductEditorForm.
+   */
+  const newProduct = useMemo(
+    () => normalizeProduct({ active: true }),
+    [],
+  );
+
   if (id && !product) {
     return (
       <EmptyState
@@ -81,10 +92,7 @@ export function AdminProductEditor() {
       key={id ?? "new"}
       id={id}
       initial={
-        product ??
-        normalizeProduct({
-          active: true,
-        })
+        product ?? newProduct
       }
     />
   );
@@ -136,7 +144,17 @@ function ProductEditorForm({
   const navigate =
     useNavigate();
 
-  const categories = useCategoryStore((state) => activeCategories(state.categories));
+  /*
+   * activeCategories() filtra y ordena, por lo que siempre devuelve un
+   * arreglo nuevo. Usarlo dentro del selector de Zustand hacía que
+   * useSyncExternalStore recibiera un snapshot nuevo en cada lectura y
+   * React reintentara el render indefinidamente en /productos/nuevo.
+   */
+  const categoryItems = useCategoryStore((state) => state.categories);
+  const categories = useMemo(
+    () => activeCategories(categoryItems),
+    [categoryItems],
+  );
 
   const upsertRemoteProduct =
     useProductStore(
