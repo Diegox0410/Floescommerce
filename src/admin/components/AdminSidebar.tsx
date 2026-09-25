@@ -33,7 +33,7 @@ export function AdminSidebar({
           <span className="admin-sidebar-eyebrow">{group}</span>
           {adminNavigation.filter((item) => item.group === group).map(({ path, title, icon: Icon }) => (
             <NavLink key={path} end={path === ""} to={`/admin${path ? "/" + path : ""}`} title={title} onClick={onNavigate} className={({ isActive }) => `admin-nav-link ${isActive ? "is-active" : ""} ${path === "configuracion" ? "admin-nav-settings" : ""}`}>
-              <Icon size={19} /><span>{path === "productos" ? "Productos / Modelos" : title}</span>
+              <Icon size={19} /><span>{path === "productos" ? "Modelos" : title}</span>
             </NavLink>
           ))}
         </div>)}

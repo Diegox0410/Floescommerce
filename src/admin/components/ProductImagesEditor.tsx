@@ -13,7 +13,7 @@ export function ProductImagesEditor({ name, primary, gallery, onPrimaryChange, o
 
   return <section className="admin-card admin-form-section product-images-editor">
     <div className="textile-editor-heading">
-      <div><h2>Imágenes</h2><p>Define la portada y todas las vistas disponibles del modelo.</p></div>
+      <div><h2>Imágenes del modelo</h2><p>Define la imagen principal y la galería de vistas del modelo.</p></div>
       <button type="button" className="admin-inline-action" onClick={() => onGalleryChange([...gallery, ""])}><Plus size={16} /> Agregar imagen</button>
     </div>
     <label className="admin-field">
@@ -31,6 +31,6 @@ export function ProductImagesEditor({ name, primary, gallery, onPrimaryChange, o
         <button type="button" aria-label={`Eliminar imagen ${index + 1}`} onClick={() => onGalleryChange(gallery.filter((_, itemIndex) => itemIndex !== index))}><Trash2 size={16} /></button>
       </div>)}
     </div>
-    <p className="admin-footnote">Admite URLs externas y rutas públicas. La primera imagen es la portada; las demás forman la galería editorial.</p>
+    <p className="admin-footnote">Admite URLs externas y rutas públicas. La imagen principal es la portada; las demás forman la galería y vistas del modelo.</p>
   </section>;
 }

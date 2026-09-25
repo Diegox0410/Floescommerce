@@ -94,7 +94,7 @@ export function AdminProducts() {
 
     if (!product) {
       setError(
-        "Producto no encontrado.",
+        "Modelo no encontrado.",
       );
       return;
     }
@@ -146,7 +146,7 @@ export function AdminProducts() {
       if (!product) {
         setDeleting(null);
         setError(
-          "Producto no encontrado.",
+          "Modelo no encontrado.",
         );
         return;
       }
@@ -204,8 +204,8 @@ export function AdminProducts() {
     <>
       <AdminSectionHeader
         eyebrow="ADMIN / CATÁLOGO"
-        title="Productos"
-        description="Gestiona catálogo, precios, costos, stock y rentabilidad."
+        title="Modelos"
+        description="Gestiona catálogo, precios, costos, stock y rentabilidad de cada modelo."
         action={
           <div className="admin-row-actions">
             <button
@@ -221,7 +221,7 @@ export function AdminProducts() {
               <FileSpreadsheet
                 size={16}
               />
-              Importar productos
+              Importar modelos
             </button>
 
             <Link
@@ -229,7 +229,7 @@ export function AdminProducts() {
               to="/admin/productos/nuevo"
             >
               <Plus size={16} />
-              Nuevo producto
+              Nuevo modelo
             </Link>
           </div>
         }
@@ -253,7 +253,7 @@ export function AdminProducts() {
         items={[
           {
             label:
-              "Productos totales",
+              "Modelos totales",
             value: String(
               products.length,
             ),
@@ -300,7 +300,7 @@ export function AdminProducts() {
 
       <section className="admin-card">
         <div className="admin-toolbar">
-          <Field label="Buscar productos">
+          <Field label="Buscar modelos">
             <input
               type="search"
               placeholder="Nombre, SKU o marca"
@@ -372,7 +372,7 @@ export function AdminProducts() {
 
         <DataTable
           columns={[
-            "Producto",
+            "Modelo",
             "SKU",
             "Categoría",
             "Stock",
@@ -505,7 +505,7 @@ export function AdminProducts() {
 
       {deleting && (
         <AdminDialog
-          title="Eliminar producto"
+          title="Eliminar modelo"
           onClose={() => {
             if (!busyId) {
               setDeleting(null);
@@ -537,7 +537,7 @@ export function AdminProducts() {
                 setDeleting(null)
               }
             >
-              Conservar producto
+              Conservar modelo
             </button>
 
             <button
@@ -552,7 +552,7 @@ export function AdminProducts() {
             >
               {busyId
                 ? "Eliminando..."
-                : "Eliminar producto"}
+                : "Eliminar modelo"}
             </button>
           </div>
         </AdminDialog>

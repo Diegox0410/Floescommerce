@@ -1035,6 +1035,22 @@
   display: inline-flex;
   margin-top: 12px;
 }
+
+.admin-legacy-details {
+  margin-top: 22px;
+  border-top: 1px solid var(--admin-line);
+  padding-top: 16px;
+}
+
+.admin-legacy-details summary {
+  cursor: pointer;
+  color: var(--admin-ink);
+  font-weight: 700;
+}
+
+.admin-legacy-details .admin-form-grid {
+  margin-top: 16px;
+}
 .admin-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1277,6 +1293,7 @@
 .admin-business-section .admin-table th small { display: block; font-size: 10px; color: var(--admin-muted); margin-top: 5px; font-weight: 400; }
 .textile-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
 .textile-editor-heading p { margin: 6px 0 0; color: var(--admin-muted); font-size: 13px; }
+.textile-guide-title { display: block; margin-bottom: 16px; }
 .textile-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .admin-inline-action { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--admin-border); border-radius: 10px; background: white; cursor: pointer; font-size: 12px; font-weight: 700; }
 .textile-color-list { display: grid; gap: 10px; }

@@ -81,8 +81,8 @@ export function AdminProductEditor() {
   if (id && !product) {
     return (
       <EmptyState
-        title="Producto no encontrado"
-        description="Vuelve a Productos para seleccionar otro registro."
+        title="Modelo no encontrado"
+        description="Vuelve a Modelos para seleccionar otro registro."
       />
     );
   }
@@ -212,6 +212,19 @@ function ProductEditorForm({
         sizeGuide: form.sizeGuide,
       };
 
+      const hasVariants = input.variants.length > 0;
+
+      if (hasVariants) {
+        input.stock = input.variants.reduce(
+          (total, variant) => total + variant.stock,
+          0,
+        );
+        input.minimumStock = input.variants.reduce(
+          (total, variant) => total + variant.minimumStock,
+          0,
+        );
+      }
+
       if (
         !input.name ||
         !input.sku
@@ -300,27 +313,23 @@ function ProductEditorForm({
 
         if (!previous) {
           throw new Error(
-            "Producto no encontrado.",
+            "Modelo no encontrado.",
           );
         }
 
-        /*
-         * IMPORTANTE:
-         *
-         * Inventario todavía se migra
-         * en el siguiente bloque.
-         *
-         * Por eso una edición general
-         * no puede modificar stock
-         * todavía.
-         */
         const updated =
           updateProductEntity(
             previous,
             {
               ...input,
               stock:
-                previous.stock,
+                hasVariants
+                  ? input.stock
+                  : previous.stock,
+              minimumStock:
+                hasVariants
+                  ? input.minimumStock
+                  : previous.minimumStock,
             },
           );
 
@@ -446,17 +455,17 @@ function ProductEditorForm({
     <>
       <DetailBack
         to="/admin/productos"
-        label="Productos"
+        label="Modelos"
       />
 
       <AdminSectionHeader
-        eyebrow="ADMIN / PRODUCTOS"
+        eyebrow="ADMIN / CATÁLOGO"
         title={
           id
-            ? "Editar producto"
-            : "Nuevo producto"
+            ? "Editar modelo"
+            : "Nuevo modelo"
         }
-        description="Cada detalle del catálogo, con su rentabilidad a la vista."
+        description="Define cada detalle del modelo y revisa su rentabilidad al instante."
       />
 
       <form
@@ -468,7 +477,7 @@ function ProductEditorForm({
         <div className="admin-form-stack">
           <section className="admin-card admin-form-section">
             <h2>
-              Información
+              Información general
             </h2>
 
             <div className="admin-form-grid">
@@ -487,11 +496,6 @@ function ProductEditorForm({
                 "Slug",
               )}
 
-              {textField(
-                "brand",
-                "Marca",
-              )}
-
               <Field label="Categoría">
                 <select required value={form.category} onChange={(event) => updateField("category", event.target.value)}>
                   <option value="">Selecciona una categoría</option>
@@ -504,48 +508,6 @@ function ProductEditorForm({
                 "shortDescription",
                 "Descripción corta",
               )}
-
-              {textField(
-                "barcode",
-                "Código de barras (opcional)",
-              )}
-
-              {textField(
-                "sizeVolume",
-                "Tamaño / volumen (opcional)",
-              )}
-
-              <Field label="Peso (opcional)">
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={
-                    form.weight ??
-                    ""
-                  }
-                  onChange={(
-                    event,
-                  ) =>
-                    updateField(
-                      "weight",
-                      event.target
-                        .value ===
-                        ""
-                        ? undefined
-                        : Math.max(
-                            0,
-                            Number(
-                              event
-                                .target
-                                .value,
-                            ) ||
-                              0,
-                          ),
-                    )
-                  }
-                />
-              </Field>
 
               <Field label="Descripción">
                 <textarea
@@ -565,6 +527,31 @@ function ProductEditorForm({
                 />
               </Field>
             </div>
+
+            <details className="admin-legacy-details">
+              <summary>Datos adicionales</summary>
+              <div className="admin-form-grid">
+                {textField("brand", "Marca")}
+                {textField("barcode", "Código de barras (opcional)")}
+                {textField("sizeVolume", "Tamaño / volumen (opcional)")}
+                <Field label="Peso (opcional)">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.weight ?? ""}
+                    onChange={(event) =>
+                      updateField(
+                        "weight",
+                        event.target.value === ""
+                          ? undefined
+                          : Math.max(0, Number(event.target.value) || 0),
+                      )
+                    }
+                  />
+                </Field>
+              </div>
+            </details>
           </section>
 
           <section className="admin-card admin-form-section">
@@ -588,12 +575,12 @@ function ProductEditorForm({
             <div className="admin-form-grid">
               {numeric(
                 "productCost",
-                "Costo producto",
+                "Costo del modelo",
               )}
 
               {numeric(
                 "importCost",
-                "Importación",
+                "Costos adicionales",
               )}
 
               {numeric(
@@ -618,26 +605,23 @@ function ProductEditorForm({
               Inventario
             </h2>
 
-            <div className="admin-form-grid">
-              {numeric(
-                "stock",
-                "Stock",
-              )}
-
-              {numeric(
-                "minimumStock",
-                "Stock mínimo",
-              )}
-            </div>
-
-            {id && (
+            {(form.variants?.length ?? 0) > 0 ? (
               <p className="admin-footnote">
-                El stock de un
-                producto existente se
-                gestiona desde
-                Inventario. Esta
-                edición no modificará
-                sus existencias.
+                Este modelo utiliza inventario por variante. El total se deriva de
+                sus combinaciones; ajusta existencias y mínimos en Variantes o
+                desde Inventario.
+              </p>
+            ) : (
+              <div className="admin-form-grid">
+                {numeric("stock", "Stock")}
+                {numeric("minimumStock", "Stock mínimo")}
+              </div>
+            )}
+
+            {id && !(form.variants?.length ?? 0) && (
+              <p className="admin-footnote">
+                El stock de un modelo existente se gestiona desde Inventario. Esta
+                edición no modificará sus existencias.
               </p>
             )}
           </section>
@@ -680,7 +664,7 @@ function ProductEditorForm({
                       [
                         "Activo",
                         "Destacado",
-                        "Best seller",
+                        "Más vendido",
                       ][index]
                     }
                   </label>
@@ -798,7 +782,7 @@ function ProductEditorForm({
           >
             {saving
               ? "Guardando..."
-              : "Guardar producto"}
+              : "Guardar modelo"}
           </button>
 
           <button
