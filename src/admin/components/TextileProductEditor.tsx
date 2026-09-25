@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import type { ProductColor, ProductVariant, SizeGuide } from "../../types/product";
 
 interface Props {
@@ -35,7 +35,25 @@ export function TextileProductEditor({ sku, colors, sizes, variants, sizeGuide, 
       const current = existing.get(`${color ?? ""}::${size ?? ""}`);
       return current ?? { id: crypto.randomUUID(), sku: [sku || "FLO", color, size].filter(Boolean).map((part) => cleanSkuPart(String(part))).join("-"), color, size, stock: 0, minimumStock: 0, active: true };
     }));
-    onVariantsChange(generated);
+    const generatedKeys = new Set(generated.map((variant) => `${variant.color ?? ""}::${variant.size ?? ""}`));
+    const unmatched = variants
+      .filter((variant) => !generatedKeys.has(`${variant.color ?? ""}::${variant.size ?? ""}`))
+      .map((variant) => ({ ...variant, active: false }));
+    onVariantsChange([...generated, ...unmatched]);
+  };
+  const removeVariant = (variant: ProductVariant) => {
+    if (variant.stock > 0) {
+      onVariantsChange(variants.map((item) => item.id === variant.id ? { ...item, active: false } : item));
+      return;
+    }
+    onVariantsChange(variants.filter((item) => item.id !== variant.id));
+  };
+  const moveSize = (index: number, direction: -1 | 1) => {
+    const destination = index + direction;
+    if (destination < 0 || destination >= sizes.length) return;
+    const next = [...sizes];
+    [next[index], next[destination]] = [next[destination], next[index]];
+    onSizesChange(next);
   };
   const syncGuideColumns = () => onSizeGuideChange({ ...guide, columns: sizes, rows: guide.rows.map((row) => ({ ...row, values: sizes.map((_, index) => row.values[index] ?? "") })) });
 
@@ -52,12 +70,12 @@ export function TextileProductEditor({ sku, colors, sizes, variants, sizeGuide, 
 
     <section className="admin-card admin-form-section textile-editor-section">
       <div className="textile-editor-heading"><div><h2>Tallas</h2><p>Agrega las tallas disponibles para este modelo.</p></div><button type="button" className="admin-inline-action" onClick={() => onSizesChange([...sizes, ""])}><Plus size={16} /> Agregar talla</button></div>
-      <div className="textile-size-list">{sizes.map((size, index) => <label key={index}><input aria-label={`Talla ${index + 1}`} value={size} placeholder="Talla" onChange={(event) => renameSize(index, event.target.value)} /><button type="button" aria-label={`Eliminar talla ${size || index + 1}`} onClick={() => onSizesChange(sizes.filter((_, itemIndex) => itemIndex !== index))}><Trash2 size={14} /></button></label>)}</div>
+      <div className="textile-size-list">{sizes.map((size, index) => <label key={index}><input aria-label={`Talla ${index + 1}`} value={size} placeholder="Talla" onChange={(event) => renameSize(index, event.target.value)} /><span className="textile-size-actions"><button type="button" aria-label={`Subir talla ${size || index + 1}`} disabled={!index} onClick={() => moveSize(index, -1)}><ArrowUp size={13} /></button><button type="button" aria-label={`Bajar talla ${size || index + 1}`} disabled={index === sizes.length - 1} onClick={() => moveSize(index, 1)}><ArrowDown size={13} /></button><button type="button" aria-label={`Eliminar talla ${size || index + 1}`} onClick={() => onSizesChange(sizes.filter((_, itemIndex) => itemIndex !== index))}><Trash2 size={14} /></button></span></label>)}</div>
     </section>
 
     <section className="admin-card admin-form-section textile-editor-section">
-      <div className="textile-editor-heading"><div><h2>Variantes</h2><p>Regenerar conserva los datos de combinaciones que ya existen.</p></div><button type="button" className="admin-inline-action" onClick={generateVariants}>Generar talla × color</button></div>
-      <div className="admin-table-scroll textile-table-scroll"><table className="admin-table textile-variants-table"><thead><tr><th>Color</th><th>Talla</th><th>SKU</th><th>Precio</th><th>Costo</th><th>Stock</th><th>Mínimo</th><th>Activa</th><th /></tr></thead><tbody>{variants.map((variant) => <tr key={variant.id}><td>{variant.color || "—"}</td><td>{variant.size || "—"}</td><td><input value={variant.sku} onChange={(event) => updateVariant(variant.id, { sku: event.target.value })} /></td><td><input type="number" min="0" step="0.01" value={variant.price ?? ""} onChange={(event) => updateVariant(variant.id, { price: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><input type="number" min="0" step="0.01" value={variant.productCost ?? ""} onChange={(event) => updateVariant(variant.id, { productCost: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><input type="number" min="0" step="1" value={variant.stock} onChange={(event) => updateVariant(variant.id, { stock: Number(event.target.value) })} /></td><td><input type="number" min="0" step="1" value={variant.minimumStock} onChange={(event) => updateVariant(variant.id, { minimumStock: Number(event.target.value) })} /></td><td><input type="checkbox" checked={variant.active} onChange={(event) => updateVariant(variant.id, { active: event.target.checked })} /></td><td><button type="button" aria-label={`Eliminar variante ${variant.sku}`} onClick={() => onVariantsChange(variants.filter((item) => item.id !== variant.id))}><Trash2 size={15} /></button></td></tr>)}</tbody></table></div>
+      <div className="textile-editor-heading"><div><h2>Variantes</h2><p>Regenerar conserva los datos existentes. Combinaciones retiradas quedan inactivas para proteger su inventario.</p></div><button type="button" className="admin-inline-action" onClick={generateVariants}>Generar talla × color</button></div>
+      <div className="admin-table-scroll textile-table-scroll"><table className="admin-table textile-variants-table"><thead><tr><th>Color</th><th>Talla</th><th>SKU</th><th>Precio</th><th>Costo</th><th>Stock</th><th>Mínimo</th><th>Activa</th><th /></tr></thead><tbody>{variants.map((variant) => <tr key={variant.id} className={!variant.active ? "is-inactive" : undefined}><td>{variant.color || "—"}</td><td>{variant.size || "—"}</td><td><input value={variant.sku} onChange={(event) => updateVariant(variant.id, { sku: event.target.value })} /></td><td><input type="number" min="0" step="0.01" value={variant.price ?? ""} onChange={(event) => updateVariant(variant.id, { price: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><input type="number" min="0" step="0.01" value={variant.productCost ?? ""} onChange={(event) => updateVariant(variant.id, { productCost: event.target.value === "" ? undefined : Number(event.target.value) })} /></td><td><input type="number" min="0" step="1" value={variant.stock} onChange={(event) => updateVariant(variant.id, { stock: Number(event.target.value) })} /></td><td><input type="number" min="0" step="1" value={variant.minimumStock} onChange={(event) => updateVariant(variant.id, { minimumStock: Number(event.target.value) })} /></td><td><input type="checkbox" checked={variant.active} onChange={(event) => updateVariant(variant.id, { active: event.target.checked })} /></td><td><button type="button" aria-label={`Eliminar variante ${variant.sku}`} onClick={() => removeVariant(variant)}><Trash2 size={15} /></button></td></tr>)}</tbody></table></div>
       {!variants.length && <p className="textile-empty">Genera combinaciones después de definir colores y tallas.</p>}
     </section>
 

@@ -113,6 +113,11 @@
   margin-top: auto;
   padding: 28px 10px 0;
 }
+.admin-nav-group { display: grid; gap: 3px; margin: 0 0 18px; }
+.admin-nav-group .admin-sidebar-eyebrow { margin: 0 0 5px; }
+.admin-production-note { margin: 6px 8px 18px; padding: 12px; border: 1px dashed rgba(255,255,255,.22); border-radius: 10px; color: rgba(255,255,255,.84); }
+.admin-production-note strong { display: block; font-size: 12px; }
+.admin-production-note span { display: block; margin-top: 4px; color: rgba(255,255,255,.56); font-size: 10px; line-height: 1.45; }
 .admin-owner {
   display: flex;
   align-items: center;
@@ -1280,11 +1285,14 @@
 .textile-color-row input,.textile-size-list input,.textile-variants-table input,.size-guide-editor input { width: 100%; min-height: 38px; padding: 7px 9px; border: 1px solid var(--admin-border); border-radius: 8px; background: white; }
 .textile-color-row button,.textile-size-list button,.textile-variants-table button,.size-guide-editor button { min-width: 34px; min-height: 34px; display: grid; place-items: center; border-radius: 8px; background: transparent; color: var(--admin-muted); cursor: pointer; }
 .textile-size-list { display: flex; flex-wrap: wrap; gap: 9px; }
-.textile-size-list label { width: 118px; display: grid; grid-template-columns: 1fr 34px; align-items: center; border: 1px solid var(--admin-border); border-radius: 999px; overflow: hidden; background: white; }
+.textile-size-list label { width: 180px; display: grid; grid-template-columns: 1fr auto; align-items: center; border: 1px solid var(--admin-border); border-radius: 999px; overflow: hidden; background: white; }
+.textile-size-actions { display: inline-flex; align-items: center; }
+.textile-size-actions button { min-width: 27px; }
 .textile-size-list input { min-width: 0; border: 0; border-radius: 0; text-align: center; }
 .textile-table-scroll { max-width: 100%; }
 .textile-variants-table { min-width: 1040px; }
 .textile-variants-table input[type="checkbox"] { width: 18px; min-height: 18px; }
+.textile-variants-table tr.is-inactive { opacity: .62; background: #faf7f2; }
 .size-guide-editor { min-width: 640px; }
 .size-guide-editor input { min-width: 90px; }
 .textile-empty { padding: 22px; border: 1px dashed var(--admin-border); border-radius: 12px; color: var(--admin-muted); text-align: center; }

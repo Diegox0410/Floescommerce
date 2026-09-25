@@ -5,6 +5,7 @@ import {
 
 import type {
   Product,
+  ProductVariant,
 } from "../../types/product";
 
 import type {
@@ -30,10 +31,12 @@ import {
 
 export function StockMovementDialog({
   product,
+  variant,
   type,
   onClose,
 }: {
   product: Product;
+  variant?: ProductVariant;
   type: MovementType;
   onClose: () => void;
 }) {
@@ -49,7 +52,7 @@ export function StockMovementDialog({
     setQuantity,
   ] = useState(
     type === "adjustment"
-      ? String(product.stock)
+      ? String(variant?.stock ?? product.stock)
       : "1",
   );
 
@@ -140,6 +143,7 @@ export function StockMovementDialog({
         .createMovement({
           productId:
             product.id,
+          variantId: variant?.id,
           type:
             movementType,
           quantity:
@@ -176,9 +180,9 @@ export function StockMovementDialog({
     >
       <p>
         {product.name} ·{" "}
-        {product.sku} ·{" "}
+        {variant ? `${[variant.color, variant.size].filter(Boolean).join(" · ")} · ${variant.sku}` : product.sku} ·{" "}
         Stock actual:{" "}
-        {product.stock}
+        {variant?.stock ?? product.stock}
       </p>
 
       <form
@@ -208,7 +212,7 @@ export function StockMovementDialog({
               ) {
                 setQuantity(
                   String(
-                    product.stock,
+                    variant?.stock ?? product.stock,
                   ),
                 );
               } else {

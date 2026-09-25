@@ -6,6 +6,7 @@ import {
 import type {
   MovementType,
 } from "../../types/inventory";
+import type { Product, ProductVariant } from "../../types/product";
 
 import {
   useProductStore,
@@ -18,7 +19,6 @@ import {
 import {
   getInventoryValue,
   getProductRealCost,
-  getStockStatus,
 } from "../../utils/productMetrics";
 
 import {
@@ -54,6 +54,15 @@ const movementNames: Record<
   out: "Salida",
   adjustment: "Ajuste",
 };
+
+interface InventoryRow {
+  product: Product;
+  variant?: ProductVariant;
+  stock: number;
+  minimumStock: number;
+  sku: string;
+  label: string;
+}
 
 export function AdminInventory() {
   const products =
@@ -107,6 +116,7 @@ export function AdminInventory() {
     setSelected,
   ] = useState<{
     id: string;
+    variantId?: string;
     type: MovementType;
   } | null>(null);
 
@@ -133,19 +143,23 @@ export function AdminInventory() {
     );
   }, [loadRemoteMovements]);
 
+  const rows: InventoryRow[] = products.flatMap<InventoryRow>((product) => product.variants.length
+    ? product.variants.map((variant) => ({ product, variant, stock: variant.stock, minimumStock: variant.minimumStock, sku: variant.sku, label: [variant.color, variant.size].filter(Boolean).join(" · ") || "Variante" }))
+    : [{ product, variant: undefined, stock: product.stock, minimumStock: product.minimumStock, sku: product.sku, label: "Producto base" }]);
+
+  const statusFor = (stock: number, minimumStock: number) => stock === 0 ? "Agotado" : stock <= minimumStock ? "Bajo" : "Normal";
+
   const visible =
-    products.filter(
-      (product) =>
-        `${product.name} ${product.sku}`
+    rows.filter(
+      ({ product, sku, label, stock, minimumStock }) =>
+        `${product.name} ${product.sku} ${sku} ${label}`
           .toLowerCase()
           .includes(
             query.toLowerCase(),
           ) &&
         (
           !stockState ||
-          getStockStatus(
-            product,
-          ) === stockState
+          statusFor(stock, minimumStock) === stockState
         ),
     );
 
@@ -176,13 +190,13 @@ export function AdminInventory() {
             label:
               "Unidades totales",
             value: String(
-              products.reduce(
+              rows.reduce(
                 (
                   total,
-                  product,
+                  row,
                 ) =>
                   total +
-                  product.stock,
+                  row.stock,
                 0,
               ),
             ),
@@ -208,11 +222,9 @@ export function AdminInventory() {
             label:
               "Stock crítico",
             value: String(
-              products.filter(
-                (product) =>
-                  getStockStatus(
-                    product,
-                  ) !== "Normal",
+              rows.filter(
+                (row) =>
+                  statusFor(row.stock, row.minimumStock) !== "Normal",
               ).length,
             ),
           },
@@ -220,9 +232,9 @@ export function AdminInventory() {
             label:
               "Agotados",
             value: String(
-              products.filter(
-                (product) =>
-                  product.stock ===
+              rows.filter(
+                (row) =>
+                  row.stock ===
                   0,
               ).length,
             ),
@@ -287,8 +299,9 @@ export function AdminInventory() {
 
         <DataTable
           columns={[
-            "Producto",
-            "SKU",
+            "Modelo",
+            "Variante",
+            "SKU variante",
             "Stock",
             "Stock mínimo",
             "Costo unitario",
@@ -298,10 +311,10 @@ export function AdminInventory() {
           ]}
         >
           {visible.map(
-            (product) => (
+            ({ product, variant, stock, minimumStock, sku, label }) => (
               <tr
                 key={
-                  product.id
+                  `${product.id}:${variant?.id ?? "base"}`
                 }
               >
                 <th scope="row">
@@ -310,21 +323,18 @@ export function AdminInventory() {
                   }
                 </th>
 
+                <td>{label}</td>
+                <td>{sku}</td>
+
                 <td>
                   {
-                    product.sku
+                    stock
                   }
                 </td>
 
                 <td>
                   {
-                    product.stock
-                  }
-                </td>
-
-                <td>
-                  {
-                    product.minimumStock
+                    minimumStock
                   }
                 </td>
 
@@ -346,9 +356,7 @@ export function AdminInventory() {
 
                 <td>
                   <Status>
-                    {getStockStatus(
-                      product,
-                    )}
+                    {statusFor(stock, minimumStock)}
                   </Status>
                 </td>
 
@@ -364,6 +372,7 @@ export function AdminInventory() {
                           {
                             id:
                               product.id,
+                            variantId: variant?.id,
                             type:
                               "in",
                           },
@@ -383,6 +392,7 @@ export function AdminInventory() {
                           {
                             id:
                               product.id,
+                            variantId: variant?.id,
                             type:
                               "out",
                           },
@@ -402,6 +412,7 @@ export function AdminInventory() {
                           {
                             id:
                               product.id,
+                            variantId: variant?.id,
                             type:
                               "adjustment",
                           },
@@ -448,6 +459,7 @@ export function AdminInventory() {
           columns={[
             "Fecha",
             "Producto",
+            "Variante",
             "Tipo",
             "Cantidad",
             "Stock anterior",
@@ -473,6 +485,8 @@ export function AdminInventory() {
                     movement.productName
                   }
                 </th>
+
+                <td>{movement.variantSku ?? "Producto base"}</td>
 
                 <td>
                   {
@@ -525,6 +539,7 @@ export function AdminInventory() {
             product={
               selectedProduct
             }
+            variant={selectedProduct.variants.find((variant) => variant.id === selected.variantId)}
             type={
               selected.type
             }
