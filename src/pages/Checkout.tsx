@@ -55,6 +55,9 @@ const initialForm: CheckoutFormData = {
 
 export function Checkout() {
   const commerce = useStoreConfigStore((s) => s.config.commerce);
+  // FLOES no define una restricción geográfica para efectivo todavía.
+  // Conservamos este indicador para los controles heredados sin bloquear ciudades.
+  const isGuayaquil = true;
   const promotions = useMarketingStore((s) => s.promotions);
   const navigate = useNavigate();
 

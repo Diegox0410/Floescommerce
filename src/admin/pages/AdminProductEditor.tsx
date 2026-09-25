@@ -212,14 +212,15 @@ function ProductEditorForm({
         sizeGuide: form.sizeGuide,
       };
 
-      const hasVariants = input.variants.length > 0;
+      const variants = input.variants ?? [];
+      const hasVariants = variants.length > 0;
 
       if (hasVariants) {
-        input.stock = input.variants.reduce(
+        input.stock = variants.reduce(
           (total, variant) => total + variant.stock,
           0,
         );
-        input.minimumStock = input.variants.reduce(
+        input.minimumStock = variants.reduce(
           (total, variant) => total + variant.minimumStock,
           0,
         );
