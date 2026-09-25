@@ -228,13 +228,13 @@ export function Catalog() {
     "NUESTRA TIENDA";
 
   let title =
-    "Encuentra algo";
+    "Conoce nuestros modelos";
 
   let accent =
-    " para ti.";
+    " FLOES.";
 
   let description =
-    "Explora nuestra selección de productos importados, cuidado personal, bienestar y mucho más.";
+    "Uniformes, textiles y productos confeccionados para profesionales de salud, belleza y bienestar.";
 
   if (
     filterParam ===

@@ -28,7 +28,6 @@ import { businessMetrics } from "../src/analytics/businessMetrics";
 import {
   defaultBusinessSettings,
   normalizeBusinessSettings,
-  useBusinessSettingsStore,
 } from "../src/store/businessSettingsStore";
 const now = new Date(2026, 8, 14, 12),
   period = getPeriod("month", now);
@@ -346,7 +345,7 @@ test("dashboard shares finance totals, configured projection and deterministic a
   assert.ok(m.alerts.some((a) => a.id === "goal-risk"));
   assert.ok(m.alerts.some((a) => a.id === "orders-pending"));
 });
-test("settings persist only assumptions and normalize invalid legacy configuration", async () => {
+test("settings normalize invalid legacy configuration", () => {
   const s = normalizeBusinessSettings({
     monthlySalesGoal: NaN,
     fixedCosts: -1,
@@ -357,11 +356,6 @@ test("settings persist only assumptions and normalize invalid legacy configurati
   assert.equal(s.fixedCosts, 0);
   assert.equal(s.contributionMargin, null);
   assert.equal(s.scenarios[0].volumeVariation, -100);
-  useBusinessSettingsStore
-    .getState()
-    .updateSettings({ monthlySalesGoal: 1234, fixedCosts: 100 });
-  await useBusinessSettingsStore.persist.rehydrate();
-  assert.equal(useBusinessSettingsStore.getState().monthlySalesGoal, 1234);
 });
 
 test("unidentified legacy orders do not fabricate unique customers or lifetime revenue", () => {

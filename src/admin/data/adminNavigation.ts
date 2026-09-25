@@ -12,11 +12,12 @@ import {
   Store,
 } from "lucide-react";
 export const adminNavigation = [
-  { path: "", title: "Dashboard", icon: LayoutDashboard },
+  { path: "", title: "Dashboard", icon: LayoutDashboard, group: "ESPACIO DE TRABAJO" },
   {
     path: "productos",
     title: "Productos",
     icon: Package,
+    group: "CATÁLOGO",
     description:
       "Gestiona catálogo, precios, costos, stock, imágenes y estados.",
     features: [
@@ -29,6 +30,7 @@ export const adminNavigation = [
     path: "inventario",
     title: "Inventario",
     icon: Boxes,
+    group: "CATÁLOGO",
     description: "Controla entradas, salidas, stock mínimo y valorización.",
     features: ["Entradas y salidas", "Alertas de stock", "Valorización"],
   },
@@ -36,6 +38,7 @@ export const adminNavigation = [
     path: "pedidos",
     title: "Pedidos",
     icon: ShoppingBag,
+    group: "VENTAS",
     description:
       "Consulta pedidos y acompaña su preparación, entrega y estado.",
     features: [
@@ -48,6 +51,7 @@ export const adminNavigation = [
     path: "clientes",
     title: "Clientes",
     icon: Users,
+    group: "VENTAS",
     description: "Conoce a tus clientes, su historial y su relación con FLOES.",
     features: ["Perfiles de clientes", "Historial de compras", "Segmentos"],
   },
@@ -55,6 +59,7 @@ export const adminNavigation = [
     path: "finanzas",
     title: "Finanzas",
     icon: Wallet,
+    group: "INTELIGENCIA",
     description: "Organiza ventas, costos, pagos y utilidad del negocio.",
     features: [
       "Ingresos y costos",
@@ -66,6 +71,7 @@ export const adminNavigation = [
     path: "proyeccion",
     title: "Proyección",
     icon: TrendingUp,
+    group: "INTELIGENCIA",
     description: "Simula ventas, metas, márgenes y escenarios.",
     features: [
       "Metas mensuales",
@@ -77,6 +83,7 @@ export const adminNavigation = [
     path: "analitica",
     title: "Analítica",
     icon: ChartNoAxesCombined,
+    group: "INTELIGENCIA",
     description:
       "Entiende el rendimiento de la tienda y descubre oportunidades.",
     features: [
@@ -89,6 +96,7 @@ export const adminNavigation = [
     path: "marketing",
     title: "Marketing",
     icon: Megaphone,
+    group: "CRECIMIENTO",
     description: "Prepara campañas y estrategias para impulsar tu tienda.",
     features: [
       "Planificación de campañas",
@@ -100,6 +108,7 @@ export const adminNavigation = [
     path: "tienda",
     title: "Tienda",
     icon: Store,
+    group: "TIENDA",
     description: "Controla identidad, Home, navegación, contacto, comercio y SEO.",
     features: ["Storefront", "Categorías", "Configuración comercial"],
   },
@@ -107,6 +116,7 @@ export const adminNavigation = [
     path: "configuracion",
     title: "Configuración",
     icon: Settings,
+    group: "SISTEMA",
     description:
       "Centraliza las preferencias de FLOES y la información del propietario.",
     features: [

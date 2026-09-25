@@ -16,7 +16,7 @@ export function getCartSubtotal(
   return items.reduce(
     (total, item) =>
       total +
-      item.product.price *
+      (item.variant?.price ?? item.product.price) *
         item.quantity,
     0
   );

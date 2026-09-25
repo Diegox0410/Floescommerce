@@ -28,23 +28,19 @@ export function AdminSidebar({
           <PanelLeftClose size={18} />
         </button>
       </div>
-      <span className="admin-sidebar-eyebrow">ESPACIO DE TRABAJO</span>
       <nav aria-label="Administración">
-        {adminNavigation.map(({ path, title, icon: Icon }) => (
-          <NavLink
-            key={path}
-            end={path === ""}
-            to={`/admin${path ? "/" + path : ""}`}
-            title={title}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `admin-nav-link ${isActive ? "is-active" : ""} ${path === "configuracion" ? "admin-nav-settings" : ""}`
-            }
-          >
-            <Icon size={19} />
-            <span>{title}</span>
-          </NavLink>
-        ))}
+        {Array.from(new Set(adminNavigation.map((item) => item.group))).map((group) => <div className="admin-nav-group" key={group}>
+          <span className="admin-sidebar-eyebrow">{group}</span>
+          {adminNavigation.filter((item) => item.group === group).map(({ path, title, icon: Icon }) => (
+            <NavLink key={path} end={path === ""} to={`/admin${path ? "/" + path : ""}`} title={title} onClick={onNavigate} className={({ isActive }) => `admin-nav-link ${isActive ? "is-active" : ""} ${path === "configuracion" ? "admin-nav-settings" : ""}`}>
+              <Icon size={19} /><span>{path === "productos" ? "Modelos" : title}</span>
+            </NavLink>
+          ))}
+        </div>)}
+        <div className="admin-production-note" aria-label="Módulo de producción próximo">
+          <strong>Producción</strong>
+          <span>Próximamente: por confeccionar, en confección y terminados.</span>
+        </div>
       </nav>
       <div className="admin-sidebar-bottom">
         <div className="admin-owner">

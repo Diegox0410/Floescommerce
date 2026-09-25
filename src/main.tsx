@@ -12,6 +12,7 @@ import "./styles/search.css";
 import "./styles/checkout.css";
 import "./styles/not-found.css";
 import "./styles/release.css";
+import "./styles/floes-theme.css";
 
 
 createRoot(

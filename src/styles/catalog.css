@@ -239,8 +239,9 @@
 }
 
 .catalog-section .product-media {
-  min-height: 390px;
+  min-height: 520px;
 }
+.catalog-section .product-content h3 { font-size: 1.75rem; }
 
 /* =========================================================
    EMPTY
@@ -362,4 +363,5 @@
   .catalog-products-grid {
     grid-template-columns: 1fr;
   }
+  .catalog-section .product-media { min-height: min(130vw, 540px); }
 }

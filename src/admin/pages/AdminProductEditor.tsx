@@ -1,5 +1,6 @@
 import {
   useState,
+  useMemo,
   type FormEvent,
 } from "react";
 import {
@@ -52,6 +53,9 @@ import {
   money,
   number,
 } from "../components/format";
+import { TextileProductEditor } from "../components/TextileProductEditor";
+import { ProductImagesEditor } from "../components/ProductImagesEditor";
+import { activeCategories, useCategoryStore } from "../../store/categoryStore";
 
 export function AdminProductEditor() {
   const { id } = useParams();
@@ -64,11 +68,21 @@ export function AdminProductEditor() {
       ),
   );
 
+  /*
+   * El editor nuevo no debe construir un producto distinto cada vez que
+   * el componente padre se renderiza. Además de evitar UUIDs efímeros,
+   * esto mantiene estable el valor inicial que recibe ProductEditorForm.
+   */
+  const newProduct = useMemo(
+    () => normalizeProduct({ active: true }),
+    [],
+  );
+
   if (id && !product) {
     return (
       <EmptyState
-        title="Producto no encontrado"
-        description="Vuelve a Productos para seleccionar otro registro."
+        title="Modelo no encontrado"
+        description="Vuelve a Modelos para seleccionar otro registro."
       />
     );
   }
@@ -78,10 +92,7 @@ export function AdminProductEditor() {
       key={id ?? "new"}
       id={id}
       initial={
-        product ??
-        normalizeProduct({
-          active: true,
-        })
+        product ?? newProduct
       }
     />
   );
@@ -124,13 +135,6 @@ function ProductEditorForm({
           : "",
     });
 
-  const [
-    extraImages,
-    setExtraImages,
-  ] = useState(
-    initial.images.join("\n"),
-  );
-
   const [error, setError] =
     useState("");
 
@@ -139,6 +143,18 @@ function ProductEditorForm({
 
   const navigate =
     useNavigate();
+
+  /*
+   * activeCategories() filtra y ordena, por lo que siempre devuelve un
+   * arreglo nuevo. Usarlo dentro del selector de Zustand hacía que
+   * useSyncExternalStore recibiera un snapshot nuevo en cada lectura y
+   * React reintentara el render indefinidamente en /productos/nuevo.
+   */
+  const categoryItems = useCategoryStore((state) => state.categories);
+  const categories = useMemo(
+    () => activeCategories(categoryItems),
+    [categoryItems],
+  );
 
   const upsertRemoteProduct =
     useProductStore(
@@ -189,15 +205,25 @@ function ProductEditorForm({
             form.name,
           ),
 
-        images:
-          extraImages
-            .split(/\n|,/)
-            .map(
-              (value) =>
-                value.trim(),
-            )
-            .filter(Boolean),
+        images: (form.images ?? []).map((value) => value.trim()).filter(Boolean),
+        colors: (form.colors ?? []).filter((color) => color.name.trim()).map((color) => ({ ...color, name: color.name.trim(), hex: color.hex?.trim() || undefined, images: (color.images ?? []).map((image) => image.trim()).filter(Boolean) })),
+        sizes: (form.sizes ?? []).map((size) => size.trim()).filter(Boolean),
+        variants: form.variants ?? [],
+        sizeGuide: form.sizeGuide,
       };
+
+      const hasVariants = input.variants.length > 0;
+
+      if (hasVariants) {
+        input.stock = input.variants.reduce(
+          (total, variant) => total + variant.stock,
+          0,
+        );
+        input.minimumStock = input.variants.reduce(
+          (total, variant) => total + variant.minimumStock,
+          0,
+        );
+      }
 
       if (
         !input.name ||
@@ -287,27 +313,23 @@ function ProductEditorForm({
 
         if (!previous) {
           throw new Error(
-            "Producto no encontrado.",
+            "Modelo no encontrado.",
           );
         }
 
-        /*
-         * IMPORTANTE:
-         *
-         * Inventario todavía se migra
-         * en el siguiente bloque.
-         *
-         * Por eso una edición general
-         * no puede modificar stock
-         * todavía.
-         */
         const updated =
           updateProductEntity(
             previous,
             {
               ...input,
               stock:
-                previous.stock,
+                hasVariants
+                  ? input.stock
+                  : previous.stock,
+              minimumStock:
+                hasVariants
+                  ? input.minimumStock
+                  : previous.minimumStock,
             },
           );
 
@@ -433,17 +455,17 @@ function ProductEditorForm({
     <>
       <DetailBack
         to="/admin/productos"
-        label="Productos"
+        label="Modelos"
       />
 
       <AdminSectionHeader
-        eyebrow="ADMIN / PRODUCTOS"
+        eyebrow="ADMIN / CATÁLOGO"
         title={
           id
-            ? "Editar producto"
-            : "Nuevo producto"
+            ? "Editar modelo"
+            : "Nuevo modelo"
         }
-        description="Cada detalle del catálogo, con su rentabilidad a la vista."
+        description="Define cada detalle del modelo y revisa su rentabilidad al instante."
       />
 
       <form
@@ -455,7 +477,7 @@ function ProductEditorForm({
         <div className="admin-form-stack">
           <section className="admin-card admin-form-section">
             <h2>
-              Información
+              Información general
             </h2>
 
             <div className="admin-form-grid">
@@ -474,62 +496,18 @@ function ProductEditorForm({
                 "Slug",
               )}
 
-              {textField(
-                "brand",
-                "Marca",
-              )}
-
-              {textField(
-                "category",
-                "Categoría",
-              )}
+              <Field label="Categoría">
+                <select required value={form.category} onChange={(event) => updateField("category", event.target.value)}>
+                  <option value="">Selecciona una categoría</option>
+                  {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
+                  {form.category && !categories.some((category) => category.name === form.category) && <option value={form.category}>{form.category}</option>}
+                </select>
+              </Field>
 
               {textField(
                 "shortDescription",
                 "Descripción corta",
               )}
-
-              {textField(
-                "barcode",
-                "Código de barras (opcional)",
-              )}
-
-              {textField(
-                "sizeVolume",
-                "Tamaño / volumen (opcional)",
-              )}
-
-              <Field label="Peso (opcional)">
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={
-                    form.weight ??
-                    ""
-                  }
-                  onChange={(
-                    event,
-                  ) =>
-                    updateField(
-                      "weight",
-                      event.target
-                        .value ===
-                        ""
-                        ? undefined
-                        : Math.max(
-                            0,
-                            Number(
-                              event
-                                .target
-                                .value,
-                            ) ||
-                              0,
-                          ),
-                    )
-                  }
-                />
-              </Field>
 
               <Field label="Descripción">
                 <textarea
@@ -549,7 +527,45 @@ function ProductEditorForm({
                 />
               </Field>
             </div>
+
+            <details className="admin-legacy-details">
+              <summary>Datos adicionales</summary>
+              <div className="admin-form-grid">
+                {textField("brand", "Marca")}
+                {textField("barcode", "Código de barras (opcional)")}
+                {textField("sizeVolume", "Tamaño / volumen (opcional)")}
+                <Field label="Peso (opcional)">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.weight ?? ""}
+                    onChange={(event) =>
+                      updateField(
+                        "weight",
+                        event.target.value === ""
+                          ? undefined
+                          : Math.max(0, Number(event.target.value) || 0),
+                      )
+                    }
+                  />
+                </Field>
+              </div>
+            </details>
           </section>
+
+          <section className="admin-card admin-form-section">
+            <h2>Confección</h2>
+            <div className="admin-form-grid">
+              <Field label="Tipo de producto"><input value={form.productType ?? ""} onChange={(event) => updateField("productType", event.target.value)} /></Field>
+              <Field label="Colección"><input value={form.collection ?? ""} onChange={(event) => updateField("collection", event.target.value)} /></Field>
+              <Field label="Audiencia"><select value={form.audience ?? ""} onChange={(event) => updateField("audience", (event.target.value || undefined) as ProductInput["audience"])}><option value="">Sin definir</option><option value="mujer">Mujer</option><option value="hombre">Hombre</option><option value="unisex">Unisex</option><option value="infantil">Infantil</option><option value="otro">Otro</option></select></Field>
+              <Field label="Tela"><input value={form.fabric ?? ""} onChange={(event) => updateField("fabric", event.target.value)} /></Field>
+              <Field label="Material"><input value={form.material ?? ""} onChange={(event) => updateField("material", event.target.value)} /></Field>
+            </div>
+          </section>
+
+          <TextileProductEditor sku={form.sku} colors={form.colors ?? []} sizes={form.sizes ?? []} variants={form.variants ?? []} sizeGuide={form.sizeGuide} onColorsChange={(value) => updateField("colors", value)} onSizesChange={(value) => updateField("sizes", value)} onVariantsChange={(value) => updateField("variants", value)} onSizeGuideChange={(value) => updateField("sizeGuide", value)} />
 
           <section className="admin-card admin-form-section">
             <h2>
@@ -559,12 +575,12 @@ function ProductEditorForm({
             <div className="admin-form-grid">
               {numeric(
                 "productCost",
-                "Costo producto",
+                "Costo del modelo",
               )}
 
               {numeric(
                 "importCost",
-                "Importación",
+                "Costos adicionales",
               )}
 
               {numeric(
@@ -589,26 +605,23 @@ function ProductEditorForm({
               Inventario
             </h2>
 
-            <div className="admin-form-grid">
-              {numeric(
-                "stock",
-                "Stock",
-              )}
-
-              {numeric(
-                "minimumStock",
-                "Stock mínimo",
-              )}
-            </div>
-
-            {id && (
+            {(form.variants?.length ?? 0) > 0 ? (
               <p className="admin-footnote">
-                El stock de un
-                producto existente se
-                gestiona desde
-                Inventario. Esta
-                edición no modificará
-                sus existencias.
+                Este modelo utiliza inventario por variante. El total se deriva de
+                sus combinaciones; ajusta existencias y mínimos en Variantes o
+                desde Inventario.
+              </p>
+            ) : (
+              <div className="admin-form-grid">
+                {numeric("stock", "Stock")}
+                {numeric("minimumStock", "Stock mínimo")}
+              </div>
+            )}
+
+            {id && !(form.variants?.length ?? 0) && (
+              <p className="admin-footnote">
+                El stock de un modelo existente se gestiona desde Inventario. Esta
+                edición no modificará sus existencias.
               </p>
             )}
           </section>
@@ -651,7 +664,7 @@ function ProductEditorForm({
                       [
                         "Activo",
                         "Destacado",
-                        "Best seller",
+                        "Más vendido",
                       ][index]
                     }
                   </label>
@@ -665,63 +678,7 @@ function ProductEditorForm({
             )}
           </section>
 
-          <section className="admin-card admin-form-section">
-            <h2>
-              Imágenes
-            </h2>
-
-            {textField(
-              "image",
-              "URL principal",
-            )}
-
-            <div
-              className="admin-product-image-preview"
-              aria-live="polite"
-            >
-              {form.image ? (
-                <img
-                  src={
-                    form.image
-                  }
-                  alt={`Vista previa de ${
-                    form.name ||
-                    "producto"
-                  }`}
-                />
-              ) : (
-                <span>
-                  La vista previa
-                  aparecerá cuando
-                  ingreses una URL.
-                </span>
-              )}
-            </div>
-
-            <Field label="URLs adicionales (una por línea)">
-              <textarea
-                rows={3}
-                value={
-                  extraImages
-                }
-                onChange={(
-                  event,
-                ) =>
-                  setExtraImages(
-                    event.target
-                      .value,
-                  )
-                }
-              />
-            </Field>
-
-            <p className="admin-footnote">
-              Puedes usar una URL
-              externa o una ruta
-              pública como
-              /images/products/producto.jpeg.
-            </p>
-          </section>
+          <ProductImagesEditor name={form.name} primary={form.image} gallery={form.images ?? []} onPrimaryChange={(value) => updateField("image", value || undefined)} onGalleryChange={(value) => updateField("images", value)} />
         </div>
 
         <aside className="admin-card admin-calculation">
@@ -825,7 +782,7 @@ function ProductEditorForm({
           >
             {saving
               ? "Guardando..."
-              : "Guardar producto"}
+              : "Guardar modelo"}
           </button>
 
           <button

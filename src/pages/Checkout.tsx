@@ -35,13 +35,6 @@ import type {
   StoreOrder,
 } from "../types/order";
 
-const normalizePlace = (value: string) =>
-  value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-
 const initialForm: CheckoutFormData = {
   customer: {
     firstName: "",
@@ -76,11 +69,6 @@ export function Checkout() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [processing, setProcessing] = useState(false);
-
-  const isGuayaquil =
-    normalizePlace(
-      form.shipping.city,
-    ) === "guayaquil";
 
   const subtotal = useMemo(() => getCartSubtotal(items), [items]);
 
@@ -131,21 +119,11 @@ export function Checkout() {
         [field]: value,
       };
 
-      const cashStillAllowed =
-        normalizePlace(
-          nextShipping.city,
-        ) === "guayaquil";
-
       return {
         ...current,
         shipping:
           nextShipping,
-        paymentMethod:
-          current.paymentMethod ===
-            "cash" &&
-          !cashStillAllowed
-            ? "transfer"
-            : current.paymentMethod,
+        paymentMethod: current.paymentMethod,
       };
     });
 
@@ -196,15 +174,6 @@ export function Checkout() {
 
     if (
       form.paymentMethod ===
-        "cash" &&
-      !isGuayaquil
-    ) {
-      nextErrors.payment =
-        "El pago en efectivo está disponible únicamente para entregas en Guayaquil.";
-    }
-
-    if (
-      form.paymentMethod ===
         "transfer" &&
       !commerce.paymentMethods
         .transfer
@@ -238,7 +207,7 @@ export function Checkout() {
 
     try {
       const current = useProductStore.getState().products;
-      const snapshots = items.map(({ product, quantity }) => {
+      const snapshots = items.map(({ product, quantity, variant }) => {
         const latest = current.find((p) => p.id === product.id);
         if (
           !latest ||
@@ -248,13 +217,22 @@ export function Checkout() {
           throw new Error(
             `${product.name} ya no está disponible. Retíralo del carrito.`,
           );
+        const latestVariant = variant ? latest.variants.find((entry) => entry.id === variant.id && entry.active) : undefined;
+        if (variant && (!latestVariant || latestVariant.stock < quantity)) throw new Error(`${product.name}: la variante seleccionada ya no está disponible.`);
         return {
           productId: latest.id,
           name: latest.name,
-          sku: latest.sku,
-          price: promotionalPrice(latest, promotions),
-          cost: getProductRealCost(latest),
+          sku: latestVariant?.sku ?? latest.sku,
+          price: latestVariant?.price ?? promotionalPrice(latest, promotions),
+          cost: latestVariant?.productCost ?? getProductRealCost(latest),
           quantity,
+          variantId: latestVariant?.id,
+          variantSku: latestVariant?.sku,
+          variantLabel: latestVariant ? [latestVariant.color, latestVariant.size].filter(Boolean).join(" / ") : undefined,
+          size: latestVariant?.size,
+          color: latestVariant?.color,
+          measurement: latestVariant?.measurement,
+          material: latestVariant?.material,
         };
       });
       const now = new Date().toISOString();

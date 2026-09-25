@@ -11,6 +11,8 @@ export function FeaturedProducts() {
     (product) => product.featured && product.active
   ).slice(0, section?.limit ?? 4);
 
+  if (!featuredProducts.length) return null;
+
   return (
     <section className="featured-products-section">
 

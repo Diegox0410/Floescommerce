@@ -3,24 +3,18 @@ import { persist } from "zustand/middleware";
 import type { Category } from "../types/category";
 import { slugify } from "../utils/normalization";
 
-const categoryNames = [
-  "Uniformes",
-  "Sábanas",
-  "Cintillos",
-  "Accesorios",
-  "Otros confeccionados",
+const categoryDefaults = [
+  { name: "Uniformes", description: "Modelos profesionales y prendas confeccionadas para distintas áreas de trabajo.", image: "/images/floes/categories/uniformes.jpeg" },
+  { name: "Sábanas", description: "Textiles confeccionados para espacios de cuidado y bienestar.", image: "/images/floes/categories/sabanas.jpeg" },
+  { name: "Cintillos", description: "Complementos textiles para rutinas profesionales y de cuidado.", image: "/images/floes/categories/cintillos.jpeg" },
+  { name: "Accesorios", description: "Piezas que complementan el trabajo cotidiano.", image: "/images/floes/categories/accesorios.jpeg" },
+  { name: "Otros confeccionados", description: "Confecciones FLOES para necesidades específicas.", image: "/images/floes/categories/otros-confeccionados.jpeg" },
 ];
 
-export const defaultCategories: Category[] = categoryNames.map(
-  (name, sortOrder) => ({
-    id: slugify(name),
-    name,
-    slug: slugify(name),
-    description: `Explora nuestra selección de ${name.toLowerCase()}.`,
-    image: `/images/categories/${slugify(name)}.jpg`,
-    active: true,
-    featured: true,
-    sortOrder,
+export const defaultCategories: Category[] = categoryDefaults.map(
+  ({ name, description, image }, sortOrder) => ({
+    id: slugify(name), name, slug: slugify(name), description, image,
+    active: true, featured: true, sortOrder,
   }),
 );
 
@@ -139,17 +133,23 @@ export const useCategoryStore = create<CategoryState>()(
     }),
     {
       name: "floes-categories",
-      version: 2,
+      version: 3,
 
       /*
        * V1 contenía las cuatro categorías demo.
        * La migración V2 instala la taxonomía
        * real del catálogo FLOES.
        */
-      migrate: () => ({
-        categories:
-          defaultCategories,
-      }),
+      migrate: (persisted) => {
+        const stored = persisted as { categories?: Category[] } | undefined;
+        if (!Array.isArray(stored?.categories)) return { categories: defaultCategories };
+        return {
+          categories: stored.categories.map((category) => {
+            const fallback = defaultCategories.find((item) => item.slug === category.slug);
+            return { ...category, image: category.image || fallback?.image || "" };
+          }),
+        };
+      },
     },
   ),
 );

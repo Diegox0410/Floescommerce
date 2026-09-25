@@ -1,4 +1,4 @@
-import type { Product } from "../types/product";
+import type { Product, ProductAudience, ProductColor, ProductVariant, SizeGuide } from "../types/product";
 import type {
   Order,
   OrderItem,
@@ -35,6 +35,36 @@ export const slugify = (v: string) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+const normalizeColors = (value: unknown): ProductColor[] =>
+  (Array.isArray(value) ? value : []).map((entry) => {
+    if (typeof entry === "string") return { name: entry };
+    const item = record(entry);
+    return {
+      name: text(item.name),
+      hex: text(item.hex) || undefined,
+      images: strings(item.images),
+    };
+  }).filter((color) => color.name);
+const normalizeVariants = (value: unknown): ProductVariant[] =>
+  (Array.isArray(value) ? value : []).map((entry) => {
+    const item = record(entry);
+    return {
+      id: text(item.id, crypto.randomUUID()), sku: text(item.sku),
+      size: text(item.size) || undefined, color: text(item.color) || undefined,
+      measurement: text(item.measurement) || undefined, material: text(item.material) || undefined,
+      price: typeof item.price === "number" ? safeNumber(item.price) : undefined,
+      productCost: typeof item.productCost === "number" ? safeNumber(item.productCost) : undefined,
+      stock: Math.floor(safeNumber(item.stock)), minimumStock: Math.floor(safeNumber(item.minimumStock)),
+      active: flag(item.active, true),
+    };
+  }).filter((variant) => variant.id && variant.sku);
+const normalizeSizeGuide = (value: unknown): SizeGuide | undefined => {
+  const guide = record(value), columns = strings(guide.columns);
+  const rows = (Array.isArray(guide.rows) ? guide.rows : []).map((entry) => {
+    const row = record(entry); return { label: text(row.label), values: strings(row.values) };
+  }).filter((row) => row.label);
+  return columns.length || rows.length ? { title: text(guide.title) || undefined, columns, rows, note: text(guide.note) || undefined } : undefined;
+};
 export function normalizeProduct(value: unknown): Product {
   const p = record(value);
   const now = new Date().toISOString();
@@ -45,10 +75,7 @@ export function normalizeProduct(value: unknown): Product {
     name: text(p.name, "Producto demo"),
     category: text(p.category, "Sin categoría"),
     brand: text(p.brand, "FLOES"),
-    description: text(
-      p.description,
-      "Producto seleccionado para complementar tu rutina de cuidado y bienestar.",
-    ),
+    description: text(p.description, "Modelo confeccionado para profesionales de salud, belleza y bienestar."),
     shortDescription: text(p.shortDescription),
     price: safeNumber(p.price),
     oldPrice:
@@ -68,6 +95,15 @@ export function normalizeProduct(value: unknown): Product {
     barcode: text(p.barcode) || undefined,
     weight: typeof p.weight === "number" ? safeNumber(p.weight) : undefined,
     sizeVolume: text(p.sizeVolume) || undefined,
+    productType: text(p.productType) || undefined,
+    collection: text(p.collection) || undefined,
+    audience: (["mujer", "hombre", "unisex", "infantil", "otro"].includes(text(p.audience)) ? text(p.audience) : undefined) as ProductAudience | undefined,
+    fabric: text(p.fabric) || undefined,
+    material: text(p.material) || undefined,
+    colors: normalizeColors(p.colors),
+    sizes: strings(p.sizes),
+    variants: normalizeVariants(p.variants),
+    sizeGuide: normalizeSizeGuide(p.sizeGuide),
     featured: flag(p.featured),
     bestSeller: flag(p.bestSeller),
     active: flag(p.active, true),
@@ -91,6 +127,13 @@ export function normalizeOrder(value: unknown): Order {
         price: safeNumber(i.price, safeNumber(legacy.price)),
         cost: safeNumber(i.cost),
         quantity: Math.floor(safeNumber(i.quantity)),
+        variantId: text(i.variantId) || undefined,
+        variantSku: text(i.variantSku) || undefined,
+        variantLabel: text(i.variantLabel) || undefined,
+        size: text(i.size) || undefined,
+        color: text(i.color) || undefined,
+        measurement: text(i.measurement) || undefined,
+        material: text(i.material) || undefined,
       };
     })
     .filter((i) => i.productId && i.quantity > 0);

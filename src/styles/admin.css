@@ -113,6 +113,11 @@
   margin-top: auto;
   padding: 28px 10px 0;
 }
+.admin-nav-group { display: grid; gap: 3px; margin: 0 0 18px; }
+.admin-nav-group .admin-sidebar-eyebrow { margin: 0 0 5px; }
+.admin-production-note { margin: 6px 8px 18px; padding: 12px; border: 1px dashed rgba(255,255,255,.22); border-radius: 10px; color: rgba(255,255,255,.84); }
+.admin-production-note strong { display: block; font-size: 12px; }
+.admin-production-note span { display: block; margin-top: 4px; color: rgba(255,255,255,.56); font-size: 10px; line-height: 1.45; }
 .admin-owner {
   display: flex;
   align-items: center;
@@ -1030,6 +1035,22 @@
   display: inline-flex;
   margin-top: 12px;
 }
+
+.admin-legacy-details {
+  margin-top: 22px;
+  border-top: 1px solid var(--admin-line);
+  padding-top: 16px;
+}
+
+.admin-legacy-details summary {
+  cursor: pointer;
+  color: var(--admin-ink);
+  font-weight: 700;
+}
+
+.admin-legacy-details .admin-form-grid {
+  margin-top: 16px;
+}
 .admin-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1270,6 +1291,33 @@
 .admin-business-period { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
 .admin-business-period .admin-field { width: 210px; }
 .admin-business-section .admin-table th small { display: block; font-size: 10px; color: var(--admin-muted); margin-top: 5px; font-weight: 400; }
+.textile-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.textile-editor-heading p { margin: 6px 0 0; color: var(--admin-muted); font-size: 13px; }
+.textile-guide-title { display: block; margin-bottom: 16px; }
+.textile-color-gallery { grid-column: 2 / -1; display: grid; gap: 8px; margin-top: 4px; }
+.textile-color-gallery > span { color: var(--admin-muted); font-size: 12px; }
+.textile-color-gallery label { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.textile-color-gallery button { width: auto; min-height: 34px; }
+.textile-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.admin-inline-action { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--admin-border); border-radius: 10px; background: white; cursor: pointer; font-size: 12px; font-weight: 700; }
+.textile-color-list { display: grid; gap: 10px; }
+.textile-color-row { display: grid; grid-template-columns: 34px minmax(120px,1fr) minmax(110px,.6fr) 36px; align-items: center; gap: 10px; }
+.textile-color-preview { width: 30px; height: 30px; border: 1px solid var(--admin-border); border-radius: 50%; background: #f1f2ef; }
+.textile-color-row input,.textile-size-list input,.textile-variants-table input,.size-guide-editor input { width: 100%; min-height: 38px; padding: 7px 9px; border: 1px solid var(--admin-border); border-radius: 8px; background: white; }
+.textile-color-row button,.textile-size-list button,.textile-variants-table button,.size-guide-editor button { min-width: 34px; min-height: 34px; display: grid; place-items: center; border-radius: 8px; background: transparent; color: var(--admin-muted); cursor: pointer; }
+.textile-size-list { display: flex; flex-wrap: wrap; gap: 9px; }
+.textile-size-list label { width: 180px; display: grid; grid-template-columns: 1fr auto; align-items: center; border: 1px solid var(--admin-border); border-radius: 999px; overflow: hidden; background: white; }
+.textile-size-actions { display: inline-flex; align-items: center; }
+.textile-size-actions button { min-width: 27px; }
+.textile-size-list input { min-width: 0; border: 0; border-radius: 0; text-align: center; }
+.textile-table-scroll { max-width: 100%; }
+.textile-variants-table { min-width: 1040px; }
+.textile-variants-table input[type="checkbox"] { width: 18px; min-height: 18px; }
+.textile-variants-table tr.is-inactive { opacity: .62; background: #faf7f2; }
+.size-guide-editor { min-width: 640px; }
+.size-guide-editor input { min-width: 90px; }
+.textile-empty { padding: 22px; border: 1px dashed var(--admin-border); border-radius: 12px; color: var(--admin-muted); text-align: center; }
+@media (max-width: 700px) { .textile-editor-heading { flex-direction: column; } .textile-heading-actions { justify-content: flex-start; } .textile-color-row { grid-template-columns: 30px 1fr 38px; } .textile-color-row input:nth-of-type(2) { grid-column: 2 / -1; grid-row: 2; } }
 .admin-business-result { margin: 22px 26px; padding: 20px; border-radius: 10px; background: #faf7fb; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 12px; }
 .admin-business-result strong { color: #51135e; font-size: 20px; overflow-wrap: anywhere; }
 .admin-business-goal-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }

@@ -87,6 +87,7 @@ export function ProductGallery({
           ))}
         </div>
       )}
+      {sources.length > 1 && <div className="product-gallery-editorial" aria-label={`Galería editorial de ${name}`}>{sources.map((url, index) => <figure key={`editorial:${url}:${index}`}><img src={url} alt={`${name}, vista ${index + 1}`} loading="lazy" /></figure>)}</div>}
     </div>
   );
 }

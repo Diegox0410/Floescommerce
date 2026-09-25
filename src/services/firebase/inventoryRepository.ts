@@ -130,6 +130,8 @@ export const getRemoteInventoryMovements =
             String(
               data.productName ?? "",
             ),
+          variantId: typeof data.variantId === "string" ? data.variantId : undefined,
+          variantSku: typeof data.variantSku === "string" ? data.variantSku : undefined,
           type:
             data.type as
               InventoryMovement["type"],
@@ -285,6 +287,8 @@ export const commitRemoteInventoryBatch =
                         data.productName ??
                           "",
                       ),
+                    variantId: typeof data.variantId === "string" ? data.variantId : undefined,
+                    variantSku: typeof data.variantSku === "string" ? data.variantSku : undefined,
                     type:
                       data.type as
                         InventoryMovement["type"],
@@ -367,12 +371,10 @@ export const commitRemoteInventoryBatch =
 
         const stocks =
           new Map(
-            [...products.values()].map(
-              (product) => [
-                product.id,
-                product.stock,
-              ],
-            ),
+            [...products.values()].flatMap((product) => [
+              [product.id, product.stock] as const,
+              ...product.variants.map((variant) => [`${product.id}::${variant.id}`, variant.stock] as const),
+            ]),
           );
 
         const now =
@@ -395,9 +397,12 @@ export const commitRemoteInventoryBatch =
                 );
               }
 
+              const stockKey = input.variantId ? `${product.id}::${input.variantId}` : product.id;
+              const variant = input.variantId ? product.variants.find((entry) => entry.id === input.variantId) : undefined;
+              if (input.variantId && !variant) throw new Error(`La variante de ${product.name} ya no existe.`);
               const previousStock =
                 stocks.get(
-                  product.id,
+                  stockKey,
                 );
 
               if (
@@ -424,7 +429,7 @@ export const commitRemoteInventoryBatch =
               }
 
               stocks.set(
-                product.id,
+                stockKey,
                 newStock,
               );
 
@@ -436,6 +441,8 @@ export const commitRemoteInventoryBatch =
                   product.id,
                 productName:
                   product.name,
+                variantId: variant?.id,
+                variantSku: variant?.sku,
                 type:
                   input.type,
                 quantity:
@@ -459,11 +466,14 @@ export const commitRemoteInventoryBatch =
                   product.id,
                 );
 
+              const variants = product.variants.map((variant) => ({ ...variant, stock: stocks.get(`${product.id}::${variant.id}`) ?? variant.stock }));
+              const aggregateStock = variants.length ? variants.reduce((sum, variant) => sum + variant.stock, 0) : stock ?? product.stock;
+
               return normalizeProduct({
                 ...product,
                 stock:
-                  stock ??
-                  product.stock,
+                  aggregateStock,
+                variants,
                 updatedAt: now,
               });
             },

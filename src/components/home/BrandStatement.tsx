@@ -1,31 +1,31 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useStoreConfigStore } from "../../store/storeConfigStore";
 
 export function BrandStatement() {
+  const story = useStoreConfigStore((state) => state.config.home.brandStory);
   return (
-    <section className="brand-statement-section">
+    <section className="brand-statement-section" id="confeccion-floes">
       <div className="container brand-statement-grid">
 
         <div className="brand-statement-copy">
           <span className="eyebrow">
-            TODO EN UN SOLO LUGAR
+            {story.eyebrow}
           </span>
 
           <h2>
-            Una tienda.
-            <span> Nuevos favoritos por descubrir.</span>
+            {story.title}
           </h2>
 
           <p>
-            Productos seleccionados, novedades y marcas importadas para
-            encontrar eso que buscas en un solo lugar.
+            {story.description}
           </p>
 
           <Link
-            to="/catalogo"
+            to={story.buttonHref || "/catalogo"}
             className="brand-statement-link"
           >
-            Descubrir categorías
+            {story.buttonLabel || "Explorar el catálogo"}
             <ArrowUpRight size={18} />
           </Link>
         </div>
@@ -34,24 +34,18 @@ export function BrandStatement() {
 
           <div className="statement-card statement-card-main">
             <img
-              src="/images/brand/Section-especial.png"
-              alt="Selección especial de productos FLOES.ec"
+              src={story.image || "/images/floes/editorial/confeccion-posterior.jpeg"}
+              alt={story.imageAlt}
               className="statement-card-image"
             />
 
             <div className="statement-card-shade" />
 
-            <img
-              src="/images/brand/dgng-logo.png"
-              alt="FLOES.ec"
-              className="statement-card-logo"
-            />
-
             <div className="statement-card-content">
-              <span>Selección especial</span>
+              <span>Hecho para tu día a día</span>
 
               <strong>
-                Diseños que se adaptan a ti.
+                Confección con identidad propia.
               </strong>
             </div>
           </div>

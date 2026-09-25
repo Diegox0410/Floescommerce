@@ -237,7 +237,7 @@ body { background: var(--dgng-background); color: var(--dgng-charcoal); }
       rgba(255, 253, 249, 0.74) 60%,
       rgba(255, 253, 249, 0.90) 100%
     ),
-    url("/images/brand/dgng-cover.jpeg");
+    url("/images/products/scrubs/maria-jose/front-01.jpeg");
 
   background-size: cover;
   background-position: center;

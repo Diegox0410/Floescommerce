@@ -150,6 +150,8 @@ export function CartDrawer() {
                   product,
                   quantity:
                     itemQuantity,
+                  lineId,
+                  variant,
                 }) => {
                   const initials =
                     product.name
@@ -216,7 +218,7 @@ export function CartDrawer() {
                             className="cart-remove"
                             onClick={() =>
                               removeItem(
-                                product.id
+                                lineId
                               )
                             }
                             aria-label={`Eliminar ${product.name}`}
@@ -236,7 +238,7 @@ export function CartDrawer() {
                               type="button"
                               onClick={() =>
                                 decreaseQuantity(
-                                  product.id
+                                  lineId
                                 )
                               }
                             >
@@ -255,7 +257,7 @@ export function CartDrawer() {
                               type="button"
                               onClick={() =>
                                 increaseQuantity(
-                                  product.id
+                                  lineId
                                 )
                               }
                             >
@@ -269,7 +271,7 @@ export function CartDrawer() {
                           <strong>
                             $
                             {(
-                              product.price *
+                              (variant?.price ?? product.price) *
                               itemQuantity
                             ).toFixed(
                               2

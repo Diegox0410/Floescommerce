@@ -2,12 +2,17 @@ import { normalizeProduct, record } from "../utils/normalization";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { Product } from "../types/product";
+import type { Product, ProductVariant } from "../types/product";
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  variant?: ProductVariant;
+  lineId: string;
 }
+
+export const cartLineId = (productId: string, variantId?: string) =>
+  variantId ? `${productId}::${variantId}` : productId;
 
 interface CartStore {
   items: CartItem[];
@@ -15,7 +20,8 @@ interface CartStore {
 
   addItem: (
     product: Product,
-    quantity?: number
+    quantity?: number,
+    variant?: ProductVariant,
   ) => void;
 
   removeItem: (
@@ -50,22 +56,21 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (
         product,
-        quantity = 1
+        quantity = 1,
+        variant,
       ) =>
         set((state) => {
+          const lineId = cartLineId(product.id, variant?.id);
           const existingItem =
             state.items.find(
-              (item) =>
-                item.product.id ===
-                product.id
+              (item) => item.lineId === lineId
             );
 
           if (existingItem) {
             return {
               items: state.items.map(
                 (item) =>
-                  item.product.id ===
-                  product.id
+                  item.lineId === lineId
                     ? {
                         ...item,
                         quantity:
@@ -84,6 +89,8 @@ export const useCartStore = create<CartStore>()(
               {
                 product,
                 quantity,
+                variant,
+                lineId,
               },
             ],
             isOpen: true,
@@ -94,8 +101,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: state.items.filter(
             (item) =>
-              item.product.id !==
-              productId
+              item.lineId !== productId
           ),
         })),
 
@@ -103,8 +109,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: state.items.map(
             (item) =>
-              item.product.id ===
-              productId
+              item.lineId === productId
                 ? {
                     ...item,
                     quantity:
@@ -118,8 +123,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: state.items
             .map((item) =>
-              item.product.id ===
-              productId
+              item.lineId === productId
                 ? {
                     ...item,
                     quantity:
@@ -140,8 +144,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: state.items
             .map((item) =>
-              item.product.id ===
-              productId
+              item.lineId === productId
                 ? {
                     ...item,
                     quantity,
@@ -179,7 +182,7 @@ export const useCartStore = create<CartStore>()(
       merge: (persisted, current) => {
         const state=record(persisted);
         const entries=Array.isArray(state.items)?state.items:[];
-        const items=entries.map(value => {const entry=record(value);return {product:normalizeProduct(entry.product),quantity:typeof entry.quantity==='number'?entry.quantity:0};}).filter(i=>Number.isInteger(i.quantity)&&i.quantity>0);
+        const items=entries.map(value => {const entry=record(value);const product=normalizeProduct(entry.product);const variantId=typeof record(entry.variant).id==='string'?String(record(entry.variant).id):undefined;const variant=product.variants.find(v=>v.id===variantId);return {product,variant,lineId:cartLineId(product.id,variant?.id),quantity:typeof entry.quantity==='number'?entry.quantity:0};}).filter(i=>Number.isInteger(i.quantity)&&i.quantity>0);
         return {...current,items};
       },
 

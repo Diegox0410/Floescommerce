@@ -1,47 +1,26 @@
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useStoreConfigStore } from "../../store/storeConfigStore";
 
 export function HeroSection() {
-  const hero = useStoreConfigStore((s) => s.config.home.hero);
-
+  const hero = useStoreConfigStore((state) => state.config.home.hero);
   if (!hero.enabled) return null;
-
-  return (
-    <section className="hero-section">
-      <div className="hero-cover-background" aria-hidden="true" />
-
-      <div className="container hero-grid">
-        <div className="hero-content">
-          <span className="eyebrow">
-  {hero.eyebrow}
-  <span className="usa-flag" aria-label="Estados Unidos" />
-</span>
-
-          <h1>{hero.title}</h1>
-
-          <p>{hero.description}</p>
-
-          <div className="hero-actions">
-            <Link to={hero.primaryButtonHref}>
-              {hero.primaryButtonLabel}
-            </Link>
-
-            {hero.secondaryButtonLabel && hero.secondaryButtonHref && (
-              <Link to={hero.secondaryButtonHref}>
-                {hero.secondaryButtonLabel}
-              </Link>
-            )}
-          </div>
-        </div>
-
-        <div className="hero-media">
-          <img
-            src="/images/brand/Feed-home.png"
-            alt="Confecciones y productos de FLOES.ec"
-            className="hero-feed-image"
-          />
-        </div>
+  const imagery = hero.image ? {
+    "--hero-image": `url(${hero.image})`,
+    "--hero-mobile-image": `url(${hero.mobileImage || hero.image})`,
+  } as CSSProperties : undefined;
+  return <section className={`floes-hero${hero.image ? " has-image" : ""}`} style={imagery}>
+    <div className="floes-hero-overlay" />
+    <div className="container floes-hero-inner">
+      <span className="floes-hero-kicker">{hero.eyebrow}</span>
+      <h1>{hero.title || "FLOES.ec"}</h1>
+      <p>{hero.description || "Confección para salud, belleza y bienestar."}</p>
+      <div className="floes-hero-actions">
+        <Link className="floes-hero-action" to={hero.primaryButtonHref || "/catalogo"}>{hero.primaryButtonLabel || "Ver catálogo"}<ArrowUpRight size={17} /></Link>
+        {hero.secondaryButtonHref && hero.secondaryButtonLabel && <a className="floes-hero-secondary" href={hero.secondaryButtonHref}>{hero.secondaryButtonLabel}</a>}
       </div>
-    </section>
-  );
+      <a className="floes-hero-scroll" href="#nuevos-modelos" aria-label="Ir a nuevos modelos"><ArrowDown size={18} /></a>
+    </div>
+  </section>;
 }

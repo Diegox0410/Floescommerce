@@ -153,6 +153,13 @@ const publicOrderData = (
 
         quantity:
           item.quantity,
+        variantId: item.variantId,
+        variantSku: item.variantSku,
+        variantLabel: item.variantLabel,
+        size: item.size,
+        color: item.color,
+        measurement: item.measurement,
+        material: item.material,
       }),
     ),
 

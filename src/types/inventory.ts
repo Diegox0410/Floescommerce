@@ -3,6 +3,8 @@ export interface InventoryMovement {
   id: string;
   productId: string;
   productName: string;
+  variantId?: string;
+  variantSku?: string;
   type: MovementType;
   quantity: number;
   previousStock: number;
@@ -13,6 +15,7 @@ export interface InventoryMovement {
 }
 export interface MovementInput {
   productId: string;
+  variantId?: string;
   type: MovementType;
   quantity: number;
   reason: string;

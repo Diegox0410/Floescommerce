@@ -127,6 +127,8 @@ export function Cart() {
               ({
                 product,
                 quantity: itemQuantity,
+                lineId,
+                variant,
               }) => {
                 const initials =
                   product.name
@@ -187,7 +189,7 @@ export function Cart() {
                           type="button"
                           onClick={() =>
                             removeItem(
-                              product.id,
+                              lineId,
                             )
                           }
                           aria-label={`Eliminar ${product.name} del carrito`}
@@ -202,7 +204,7 @@ export function Cart() {
                             type="button"
                             onClick={() =>
                               decreaseQuantity(
-                                product.id,
+                                lineId,
                               )
                             }
                             aria-label="Disminuir cantidad"
@@ -218,7 +220,7 @@ export function Cart() {
                             type="button"
                             onClick={() =>
                               increaseQuantity(
-                                product.id,
+                                lineId,
                               )
                             }
                             aria-label="Aumentar cantidad"
@@ -230,7 +232,7 @@ export function Cart() {
                         <strong>
                           $
                           {(
-                            product.price *
+                            (variant?.price ?? product.price) *
                             itemQuantity
                           ).toFixed(2)}
                         </strong>

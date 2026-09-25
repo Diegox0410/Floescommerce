@@ -71,8 +71,7 @@ export function ProductCard({
 
       <div className="product-content">
         <span className="product-category">
-          {product.brand ||
-            product.category}
+          {[product.collection, product.category].filter(Boolean).join(" · ")}
         </span>
 
         <Link
@@ -81,8 +80,24 @@ export function ProductCard({
           <h3>{product.name}</h3>
         </Link>
 
+        {product.colors.some((color) => color.hex) && (
+          <div className="product-color-preview" aria-label={`Colores disponibles para ${product.name}`}>
+            {product.colors.filter((color) => color.hex).slice(0, 5).map((color) => (
+              <span
+                key={`${product.id}:${color.name}`}
+                className="product-color-dot"
+                style={{ backgroundColor: color.hex }}
+                title={color.name}
+              />
+            ))}
+            {product.colors.filter((color) => color.hex).length > 5 && (
+              <small>+{product.colors.filter((color) => color.hex).length - 5}</small>
+            )}
+          </div>
+        )}
+
         <div className="product-footer">
-          <div className="product-pricing">
+          {price > 0 && <div className="product-pricing">
             <strong>
               ${price.toFixed(2)}
             </strong>
@@ -98,9 +113,9 @@ export function ProductCard({
                 ).toFixed(2)}
               </span>
             )}
-          </div>
+          </div>}
 
-          <button
+          {product.variants.length ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
             className="product-add-button"
             type="button"
             onClick={handleAddToCart}
@@ -111,7 +126,7 @@ export function ProductCard({
             <span>
               Agregar al carrito
             </span>
-          </button>
+          </button>}
         </div>
       </div>
     </article>
