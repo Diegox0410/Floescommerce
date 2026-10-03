@@ -3,21 +3,16 @@ import { persist } from "zustand/middleware";
 
 import type { Order } from "../types/order";
 
-import {
-  createRemoteOrder,
-} from "../services/firebase/orderRepository";
+import { createChopifyOrder } from "../services/chopify/orders";
 
 import {
   record,
   text,
 } from "../utils/normalization";
 
-import {
-  useOrderStore,
-} from "./orderStore";
-
 interface CheckoutStore {
   lastOrderId: string | null;
+  lastOrder: Order | null;
   saving: boolean;
   saveError: string | null;
 
@@ -42,7 +37,7 @@ const hydrate = (
    * Ya NO reconstruimos pedidos
    * dentro de hydrate porque la
    * persistencia autoritativa vive
-   * en Firestore.
+   * en Chopify.
    */
   const legacyOrder =
     record(state.lastOrder);
@@ -57,6 +52,10 @@ const hydrate = (
       ) ||
       legacyOrderId ||
       null,
+    lastOrder:
+      Object.keys(legacyOrder).length
+        ? legacyOrder as unknown as Order
+        : null,
   };
 };
 
@@ -65,6 +64,7 @@ export const useCheckoutStore =
     persist(
       (set) => ({
         lastOrderId: null,
+        lastOrder: null,
         saving: false,
         saveError: null,
 
@@ -78,25 +78,14 @@ export const useCheckoutStore =
 
           try {
             const saved =
-              await createRemoteOrder(
+              await createChopifyOrder(
                 order,
-              );
-
-            /*
-             * Mantener el pedido recién
-             * creado disponible en esta
-             * sesión sin convertirlo en
-             * persistencia local.
-             */
-            useOrderStore
-              .getState()
-              .upsertRemoteOrder(
-                saved,
               );
 
             set({
               lastOrderId:
                 saved.id,
+              lastOrder: saved,
               saving: false,
               saveError: null,
             });
@@ -120,6 +109,7 @@ export const useCheckoutStore =
         clearLastOrder: () =>
           set({
             lastOrderId: null,
+            lastOrder: null,
           }),
 
         clearSaveError: () =>
@@ -137,6 +127,8 @@ export const useCheckoutStore =
         ) => ({
           lastOrderId:
             state.lastOrderId,
+          lastOrder:
+            state.lastOrder,
         }),
 
         migrate: hydrate,

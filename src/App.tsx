@@ -1,5 +1,4 @@
 import { AdminProductEditor } from './admin/pages/AdminProductEditor';
-import { AdminOrderDetail } from './admin/pages/AdminOrderDetail';
 import { AdminCustomerDetail } from './admin/pages/AdminCustomerDetail';
 import { AdminLayout } from './admin/layout/AdminLayout';
 import { AdminDashboard } from './admin/pages/AdminDashboard';
@@ -116,7 +115,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="productos/nuevo" element={<AdminProductEditor />} />
           <Route path="productos/:id" element={<AdminProductEditor />} />
-          <Route path="pedidos/:id" element={<AdminOrderDetail />} />
+          <Route path="pedidos/:id" element={<AdminOrders />} />
           <Route path="clientes/:id" element={<AdminCustomerDetail />} />
           <Route path="productos" element={<AdminProducts />} />
           <Route path="inventario" element={<AdminInventory />} />

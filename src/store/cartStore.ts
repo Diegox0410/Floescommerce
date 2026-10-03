@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { Product, ProductVariant } from "../types/product";
+import { canPurchase } from "../services/chopify/catalog";
 
 export interface CartItem {
   product: Product;
@@ -60,6 +61,7 @@ export const useCartStore = create<CartStore>()(
         variant,
       ) =>
         set((state) => {
+          if (!canPurchase(product, variant)) return state;
           const lineId = cartLineId(product.id, variant?.id);
           const existingItem =
             state.items.find(

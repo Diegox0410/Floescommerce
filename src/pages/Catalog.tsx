@@ -12,6 +12,7 @@ import { CatalogGrid } from "../components/catalog/CatalogGrid";
 
 import { useProductStore } from "../store/productStore";
 import { slugify } from "../utils/normalization";
+import { hasKnownPrice } from "../services/chopify/catalog";
 
 export function Catalog() {
   const products = useProductStore(state => state.products);
@@ -170,17 +171,19 @@ export function Catalog() {
       switch (sort) {
         case "price-low":
           result.sort(
-            (a, b) =>
-              a.price -
-              b.price
+            (a, b) => {
+              if (hasKnownPrice(a) !== hasKnownPrice(b)) return hasKnownPrice(a) ? -1 : 1;
+              return a.price - b.price;
+            }
           );
           break;
 
         case "price-high":
           result.sort(
-            (a, b) =>
-              b.price -
-              a.price
+            (a, b) => {
+              if (hasKnownPrice(a) !== hasKnownPrice(b)) return hasKnownPrice(a) ? -1 : 1;
+              return b.price - a.price;
+            }
           );
           break;
 

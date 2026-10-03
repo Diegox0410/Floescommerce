@@ -3,6 +3,7 @@ import { useProductStore } from "../store/productStore";
 import { useMarketingStore } from "../store/marketingStore";
 import { useStoreConfigStore } from "../store/storeConfigStore";
 import { promotionalPrice } from "../utils/storefront";
+import { canPurchase, hasKnownPrice } from "../services/chopify/catalog";
 import { getProductRealCost } from "../utils/productMetrics";
 import {
   getOrderEstimatedCost,
@@ -215,13 +216,16 @@ export function Checkout() {
         if (
           !latest ||
           !latest.active ||
-          !(latest.inStock ?? latest.stock > 0)
+          latest.inStock === false
         )
           throw new Error(
             `${product.name} ya no está disponible. Retíralo del carrito.`,
           );
         const latestVariant = variant ? latest.variants.find((entry) => entry.id === variant.id && entry.active) : undefined;
-        if (variant && (!latestVariant || latestVariant.stock < quantity)) throw new Error(`${product.name}: la variante seleccionada ya no está disponible.`);
+        if (variant && !latestVariant) throw new Error(`${product.name}: la variante seleccionada ya no está disponible.`);
+        if (!hasKnownPrice(latest, latestVariant)) throw new Error(`${product.name} todavía no tiene un precio publicado.`);
+        if (!canPurchase(latest, latestVariant)) throw new Error(`${product.name} ya no está disponible.`);
+        if (latestVariant?.fulfillmentMode === "STOCK" && latestVariant.availableQuantity !== null && latestVariant.availableQuantity !== undefined && latestVariant.availableQuantity < quantity) throw new Error(`${product.name}: no hay unidades suficientes.`);
         return {
           productId: latest.id,
           name: latest.name,
@@ -261,7 +265,9 @@ export function Checkout() {
       order.total = order.subtotal + (shippingCost ?? 0);
       order.estimatedCost = getOrderEstimatedCost(order);
       order.estimatedProfit = getOrderEstimatedProfit(order);
-      await saveOrder(order);
+      const saved = await saveOrder(order);
+      clearCart();
+      navigate(`/pedido-confirmado?pedido=${encodeURIComponent(saved.id)}`);
     } catch (error) {
       setErrors((current) => ({
         ...current,
@@ -274,9 +280,6 @@ export function Checkout() {
       return;
     }
 
-    clearCart();
-
-    navigate("/pedido-confirmado");
   };
 
   return (

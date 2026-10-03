@@ -12,6 +12,7 @@ import { useCartStore } from "../../store/cartStore";
 import { useMarketingStore } from "../../store/marketingStore";
 
 import { promotionalPrice } from "../../utils/storefront";
+import { canPurchase, hasKnownPrice } from "../../services/chopify/catalog";
 
 interface ProductCardProps {
   product: Product;
@@ -36,6 +37,7 @@ export function ProductCard({
   const handleAddToCart = () => {
     addItem(product, 1);
   };
+  const knownPrice = hasKnownPrice(product);
 
   return (
     <article className="product-card">
@@ -97,7 +99,7 @@ export function ProductCard({
         )}
 
         <div className="product-footer">
-          {price > 0 && <div className="product-pricing">
+          {knownPrice ? <div className="product-pricing">
             <strong>
               ${price.toFixed(2)}
             </strong>
@@ -113,9 +115,9 @@ export function ProductCard({
                 ).toFixed(2)}
               </span>
             )}
-          </div>}
+          </div> : <div className="product-pricing"><strong>Precio por confirmar</strong></div>}
 
-          {product.variants.length ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
+          {product.variants.length || !canPurchase(product) ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
             className="product-add-button"
             type="button"
             onClick={handleAddToCart}

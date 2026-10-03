@@ -1,14 +1,10 @@
-import { useOrderStore } from "../store/orderStore";
 import {
   ArrowRight,
   Check,
   PackageCheck,
 } from "lucide-react";
 
-import {
-  Link,
-  Navigate,
-} from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 
 import {
   useCheckoutStore,
@@ -16,10 +12,12 @@ import {
 import { WhatsAppCTA } from "../components/common/WhatsAppCTA";
 
 export function OrderSuccess() {
+  const [params] = useSearchParams();
   const lastOrderId = useCheckoutStore(state => state.lastOrderId);
-  const order = useOrderStore(state => state.orders.find(o => o.id === lastOrderId));
+  const order = useCheckoutStore(state => state.lastOrder);
+  const requestedOrderId = params.get("pedido");
 
-  if (!order) {
+  if (!order || (requestedOrderId && requestedOrderId !== lastOrderId)) {
     return (
       <Navigate
         to="/"

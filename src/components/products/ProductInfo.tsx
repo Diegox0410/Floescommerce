@@ -1,6 +1,7 @@
 import type { Product } from "../../types/product";
 
 import { useStoreConfigStore } from "../../store/storeConfigStore";
+import { hasKnownPrice } from "../../services/chopify/catalog";
 
 interface ProductInfoProps {
   product: Product;
@@ -27,7 +28,7 @@ export function ProductInfo({
 
       <h1 className="product-info-name">{product.name}</h1>
 
-      {product.price > 0 && <div className="product-detail-price">
+      {hasKnownPrice(product) ? <div className="product-detail-price">
         <strong>
           ${product.price.toFixed(2)}
         </strong>
@@ -37,13 +38,15 @@ export function ProductInfo({
             ${product.oldPrice.toFixed(2)}
           </span>
         )}
-      </div>}
+      </div> : <div className="product-detail-price"><strong>Precio por confirmar</strong></div>}
 
       <p className="product-detail-description">
         {product.shortDescription ||
           product.description ||
           ""}
       </p>
+
+      {product.fulfillmentMode === "MADE_TO_ORDER" && <p className="product-purchase-note">Confección bajo pedido. La disponibilidad no representa unidades en inventario.</p>}
 
       {(product.fabric || product.material) && <div className="product-textile-meta"><span>Tela / material</span><strong>{product.fabric || product.material}</strong></div>}
 

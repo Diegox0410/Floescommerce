@@ -36,7 +36,7 @@ export const slugify = (v: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 const normalizeColors = (value: unknown): ProductColor[] =>
-  (Array.isArray(value) ? value : []).map((entry) => {
+  (Array.isArray(value) ? value : []).map((entry): ProductColor => {
     if (typeof entry === "string") return { name: entry };
     const item = record(entry);
     return {
@@ -46,7 +46,7 @@ const normalizeColors = (value: unknown): ProductColor[] =>
     };
   }).filter((color) => color.name);
 const normalizeVariants = (value: unknown): ProductVariant[] =>
-  (Array.isArray(value) ? value : []).map((entry) => {
+  (Array.isArray(value) ? value : []).map((entry): ProductVariant => {
     const item = record(entry);
     return {
       id: text(item.id, crypto.randomUUID()), sku: text(item.sku),
@@ -56,6 +56,11 @@ const normalizeVariants = (value: unknown): ProductVariant[] =>
       productCost: typeof item.productCost === "number" ? safeNumber(item.productCost) : undefined,
       stock: Math.floor(safeNumber(item.stock)), minimumStock: Math.floor(safeNumber(item.minimumStock)),
       active: flag(item.active, true),
+      pricingStatus: item.pricingStatus === "PENDING" ? "PENDING" : item.pricingStatus === "READY" ? "READY" : undefined,
+      availabilityStatus: ["AVAILABLE", "OUT_OF_STOCK", "NOT_CONFIGURED"].includes(text(item.availabilityStatus)) ? text(item.availabilityStatus) as ProductVariant["availabilityStatus"] : undefined,
+      available: typeof item.available === "boolean" ? item.available : undefined,
+      availableQuantity: item.availableQuantity === null ? null : typeof item.availableQuantity === "number" ? Math.floor(safeNumber(item.availableQuantity)) : undefined,
+      fulfillmentMode: ["STOCK", "MADE_TO_ORDER", "SERVICE", "DIGITAL", "HYBRID"].includes(text(item.fulfillmentMode)) ? text(item.fulfillmentMode) as ProductVariant["fulfillmentMode"] : undefined,
     };
   }).filter((variant) => variant.id && variant.sku);
 const normalizeSizeGuide = (value: unknown): SizeGuide | undefined => {
@@ -89,6 +94,9 @@ export function normalizeProduct(value: unknown): Product {
       typeof p.inStock === "boolean"
         ? p.inStock
         : Math.floor(safeNumber(p.stock)) > 0,
+    pricingStatus: p.pricingStatus === "PENDING" ? "PENDING" : p.pricingStatus === "READY" ? "READY" : undefined,
+    availabilityStatus: ["AVAILABLE_BY_MODE", "AVAILABLE", "OUT_OF_STOCK", "NOT_CONFIGURED"].includes(text(p.availabilityStatus)) ? text(p.availabilityStatus) as Product["availabilityStatus"] : undefined,
+    fulfillmentMode: ["STOCK", "MADE_TO_ORDER", "SERVICE", "DIGITAL", "HYBRID"].includes(text(p.fulfillmentMode)) ? text(p.fulfillmentMode) as Product["fulfillmentMode"] : undefined,
     image: text(p.image) || undefined,
     images: strings(p.images),
     badge: text(p.badge) || undefined,

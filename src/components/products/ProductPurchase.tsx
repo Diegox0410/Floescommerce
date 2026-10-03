@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import type { Product } from "../../types/product";
 import { useCartStore } from "../../store/cartStore";
 import { WhatsAppCTA } from "../common/WhatsAppCTA";
+import { canPurchase, hasKnownPrice } from "../../services/chopify/catalog";
 
 export function ProductPurchase({ product, color: controlledColor, onColorChange }: { product: Product; color?: string; onColorChange?: (color: string) => void }) {
   const variants = useMemo(() => product.variants.filter((variant) => variant.active), [product.variants]);
@@ -24,14 +25,15 @@ export function ProductPurchase({ product, color: controlledColor, onColorChange
   const colorData = (value: string) => product.colors.find((entry) => entry.name === value);
   // Regla actual centralizada: hasta definir la política de confección bajo pedido,
   // una variante con stock exactamente cero conserva el bloqueo existente.
-  const selectedVariantIsPurchasable = selected?.stock !== 0;
+  const selectedVariantIsPurchasable = selected ? canPurchase(product, selected) : canPurchase(product);
+  const priceKnown = selected ? hasKnownPrice(product, selected) : hasKnownPrice(product);
 
   return <div className="product-purchase">
     {colors.length > 0 && <fieldset className="variant-selector color-selector"><legend>Color {color && <strong>{color}</strong>}</legend><div className="variant-options">{colors.map((value) => { const data = colorData(value); return <button type="button" key={value} disabled={!colorEnabled(value)} className={`${color === value ? "active" : ""}${data?.hex ? " has-swatch" : ""}`} onClick={() => selectColor(value)} aria-label={`Color ${value}`} title={value}>{data?.hex && <span className="color-swatch" style={{ backgroundColor: data.hex }} aria-hidden="true" />}<span>{value}</span></button>; })}</div></fieldset>}
     {sizes.length > 0 && <fieldset className="variant-selector"><legend>Talla</legend><div className="variant-options">{sizes.map((value) => <button type="button" key={value} disabled={!sizeEnabled(value)} className={size === value ? "active" : ""} onClick={() => setSize(value)}>{value}</button>)}</div></fieldset>}
     <div className="product-quantity"><span>Cantidad</span><div className="product-quantity-control"><button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Disminuir cantidad" disabled={quantity <= 1}><Minus size={16} /></button><strong>{quantity}</strong><button type="button" onClick={() => setQuantity((value) => value + 1)} aria-label="Aumentar cantidad"><Plus size={16} /></button></div></div>
-    <div className="product-purchase-actions"><button className="product-main-add" type="button" disabled={missing || !selectedVariantIsPurchasable} onClick={() => addItem(product, quantity, selected)}><ShoppingBag size={18} />{missing ? "Selecciona talla y color" : "Agregar al carrito"}</button></div>
-    <p className="product-purchase-note">{selected ? `${selected.sku} · ${[selected.color, selected.size].filter(Boolean).join(" / ")}` : variants.length ? "Elige una combinación disponible." : `Estás seleccionando ${quantity} unidad${quantity !== 1 ? "es" : ""} de ${product.name}.`}</p>
+    <div className="product-purchase-actions"><button className="product-main-add" type="button" disabled={missing || !selectedVariantIsPurchasable} onClick={() => addItem(product, quantity, selected)}><ShoppingBag size={18} />{missing ? "Selecciona talla y color" : !priceKnown ? "Precio por confirmar" : !selectedVariantIsPurchasable ? "No disponible" : "Agregar al carrito"}</button></div>
+    <p className="product-purchase-note">{!priceKnown ? "FLOES aún no ha publicado el precio. Puedes consultar este modelo por WhatsApp, pero no se agregará un valor ficticio al carrito." : selected ? `${selected.sku} · ${[selected.color, selected.size].filter(Boolean).join(" / ")}` : variants.length ? "Elige una combinación disponible." : `Estás seleccionando ${quantity} unidad${quantity !== 1 ? "es" : ""} de ${product.name}.`}</p>
     <WhatsAppCTA productName={product.name} className="product-whatsapp" />
   </div>;
 }

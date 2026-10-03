@@ -6,7 +6,7 @@ import {
 import {
   ChevronLeft,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useProductStore } from "../store/productStore";
 import { useMarketingStore } from "../store/marketingStore";
@@ -26,14 +26,10 @@ export function ProductDetail() {
       (item) =>
         item.id === id
     );
-  const displayProduct = product ? { ...product, oldPrice: promotionalPrice(product, promotions) < product.price ? product.price : product.oldPrice, price: promotionalPrice(product, promotions) } : undefined;
-  const availableColors = displayProduct?.variants.filter((variant) => variant.active).map((variant) => variant.color).filter((color): color is string => Boolean(color)) ?? [];
-  const [selectedColor, setSelectedColor] = useState(availableColors.length === 1 ? availableColors[0] : "");
-  useEffect(() => {
-    if (availableColors.length === 1 && !selectedColor) {
-      setSelectedColor(availableColors[0]);
-    }
-  }, [availableColors, selectedColor]);
+  const displayProduct = useMemo(() => product ? { ...product, oldPrice: promotionalPrice(product, promotions) < product.price ? product.price : product.oldPrice, price: promotionalPrice(product, promotions) } : undefined, [product, promotions]);
+  const availableColors = useMemo(() => displayProduct?.variants.filter((variant) => variant.active).map((variant) => variant.color).filter((color): color is string => Boolean(color)) ?? [], [displayProduct]);
+  const [selectedColorState, setSelectedColor] = useState("");
+  const selectedColor = selectedColorState || (availableColors.length === 1 ? availableColors[0] : "");
   const colorGallery = displayProduct?.colors.find((color) => color.name === selectedColor)?.images ?? [];
   const galleryImages = colorGallery.length ? colorGallery : displayProduct?.images ?? [];
   const galleryImage = colorGallery[0] ?? displayProduct?.image;

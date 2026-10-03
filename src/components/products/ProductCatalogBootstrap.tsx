@@ -5,7 +5,9 @@ import {
 
 import { useProductStore } from "../../store/productStore";
 
-import { getPublicCatalog } from "../../services/firebase/productRepository";
+import { fetchChopifyCatalog } from "../../services/chopify/catalog";
+import { canPurchase } from "../../services/chopify/catalog";
+import { useCartStore } from "../../store/cartStore";
 
 interface ProductCatalogBootstrapProps {
   children: ReactNode;
@@ -25,7 +27,7 @@ export function ProductCatalogBootstrap({
 
       try {
         const products =
-          await getPublicCatalog();
+          await fetchChopifyCatalog();
 
         if (!active) return;
 
@@ -35,6 +37,14 @@ export function ProductCatalogBootstrap({
             products,
             "catalog",
           );
+
+        const catalog = new Map(products.map((product) => [product.id, product]));
+        const cart = useCartStore.getState();
+        cart.items.forEach((item) => {
+          const product = catalog.get(item.product.id);
+          const variant = item.variant ? product?.variants.find((entry) => entry.id === item.variant?.id) : undefined;
+          if (!product || !canPurchase(product, variant)) cart.removeItem(item.lineId);
+        });
       } catch (error) {
         if (!active) return;
 
@@ -47,10 +57,6 @@ export function ProductCatalogBootstrap({
             "catalog",
           );
 
-        console.error(
-          "FLOES catalog bootstrap:",
-          error,
-        );
       }
     };
 
@@ -61,5 +67,12 @@ export function ProductCatalogBootstrap({
     };
   }, []);
 
+  const state = useProductStore();
+  if (state.remoteLoading || (!state.remoteReady && !state.remoteError)) {
+    return <main className="product-not-found"><div className="container"><h1>Cargando catálogo…</h1></div></main>;
+  }
+  if (state.remoteError) {
+    return <main className="product-not-found"><div className="container"><h1>El catálogo no está disponible.</h1><p>{state.remoteError}</p><button type="button" onClick={() => window.location.reload()}>Reintentar</button></div></main>;
+  }
   return <>{children}</>;
 }

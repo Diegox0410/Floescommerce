@@ -239,12 +239,7 @@ export function AdminLayout() {
     };
   }, [mobileOpen]);
 
-  return (
-    <AdminAuthGuard>
-      <AdminProductBootstrap>
-        <AdminCustomerBootstrap>
-          <AdminOrderBootstrap>
-            <AdminBusinessSettingsBootstrap>
+  const content = (
               <div
                 className={`admin-shell ${
                   collapsed
@@ -359,15 +354,26 @@ export function AdminLayout() {
                     </span>
 
                     <span>
-                      Firebase · Datos privados
+                      Chopify · tenant-floes
                     </span>
                   </footer>
                 </div>
               </div>
-            </AdminBusinessSettingsBootstrap>
-          </AdminOrderBootstrap>
-        </AdminCustomerBootstrap>
-      </AdminProductBootstrap>
+  );
+
+  const usesChopifyOperations = pathname === "/admin" || pathname.startsWith("/admin/pedidos");
+
+  return (
+    <AdminAuthGuard>
+      {usesChopifyOperations ? content : (
+        <AdminProductBootstrap>
+          <AdminCustomerBootstrap>
+            <AdminOrderBootstrap>
+              <AdminBusinessSettingsBootstrap>{content}</AdminBusinessSettingsBootstrap>
+            </AdminOrderBootstrap>
+          </AdminCustomerBootstrap>
+        </AdminProductBootstrap>
+      )}
     </AdminAuthGuard>
   );
 }

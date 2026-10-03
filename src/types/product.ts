@@ -19,6 +19,11 @@ export interface ProductVariant {
   stock: number;
   minimumStock: number;
   active: boolean;
+  pricingStatus?: "READY" | "PENDING";
+  availabilityStatus?: "AVAILABLE" | "OUT_OF_STOCK" | "NOT_CONFIGURED";
+  available?: boolean;
+  availableQuantity?: number | null;
+  fulfillmentMode?: "STOCK" | "MADE_TO_ORDER" | "SERVICE" | "DIGITAL" | "HYBRID";
 }
 
 export interface SizeGuideRow {
@@ -51,6 +56,9 @@ export interface Product {
   minimumStock: number;
   /** Public catalog availability flag. Real stock stays private. */
   inStock?: boolean;
+  pricingStatus?: "READY" | "PENDING";
+  availabilityStatus?: "AVAILABLE_BY_MODE" | "AVAILABLE" | "OUT_OF_STOCK" | "NOT_CONFIGURED";
+  fulfillmentMode?: "STOCK" | "MADE_TO_ORDER" | "SERVICE" | "DIGITAL" | "HYBRID";
   image?: string;
   images: string[];
   badge?: string;

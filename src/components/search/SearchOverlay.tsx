@@ -17,6 +17,7 @@ import {
 
 import { useProductStore } from "../../store/productStore";
 import { useStoreConfigStore } from "../../store/storeConfigStore";
+import { hasKnownPrice } from "../../services/chopify/catalog";
 
 interface SearchOverlayProps {
   open: boolean;
@@ -248,10 +249,9 @@ export function SearchOverlay({
                       </div>
 
                       <div className="search-result-price">
-                        $
-                        {product.price.toFixed(
-                          2
-                        )}
+                        {hasKnownPrice(product)
+                          ? "$" + product.price.toFixed(2)
+                          : "Precio por confirmar"}
                       </div>
 
                       <ArrowRight
