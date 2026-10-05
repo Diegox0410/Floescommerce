@@ -2,9 +2,6 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Users,
-  Wallet,
-  TrendingUp,
-  ChartNoAxesCombined,
   Megaphone,
   Settings,
   Store,
@@ -32,43 +29,6 @@ export const adminNavigation = [
     group: "VENTAS",
     description: "Conoce a tus clientes, su historial y su relación con FLOES.",
     features: ["Perfiles de clientes", "Historial de compras", "Segmentos"],
-  },
-  {
-    path: "finanzas",
-    title: "Finanzas",
-    icon: Wallet,
-    group: "INTELIGENCIA",
-    description: "Organiza ventas, costos, pagos y utilidad del negocio.",
-    features: [
-      "Ingresos y costos",
-      "Pagos por confirmar",
-      "Resumen de utilidad",
-    ],
-  },
-  {
-    path: "proyeccion",
-    title: "Proyección",
-    icon: TrendingUp,
-    group: "INTELIGENCIA",
-    description: "Simula ventas, metas, márgenes y escenarios.",
-    features: [
-      "Metas mensuales",
-      "Escenarios de ventas",
-      "Estimación de márgenes",
-    ],
-  },
-  {
-    path: "analitica",
-    title: "Analítica",
-    icon: ChartNoAxesCombined,
-    group: "INTELIGENCIA",
-    description:
-      "Entiende el rendimiento de la tienda y descubre oportunidades.",
-    features: [
-      "Indicadores de rendimiento",
-      "Tendencias de ventas",
-      "Rendimiento del catálogo",
-    ],
   },
   {
     path: "marketing",

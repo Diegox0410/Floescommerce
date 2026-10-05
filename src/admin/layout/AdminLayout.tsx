@@ -23,10 +23,6 @@ import {
 } from "../components/AdminAuthGuard";
 
 import {
-  AdminProductBootstrap,
-} from "../components/AdminProductBootstrap";
-
-import {
   AdminCustomerBootstrap,
 } from "../components/AdminCustomerBootstrap";
 
@@ -366,13 +362,11 @@ export function AdminLayout() {
   return (
     <AdminAuthGuard>
       {usesChopifyOperations ? content : (
-        <AdminProductBootstrap>
-          <AdminCustomerBootstrap>
-            <AdminOrderBootstrap>
-              <AdminBusinessSettingsBootstrap>{content}</AdminBusinessSettingsBootstrap>
-            </AdminOrderBootstrap>
-          </AdminCustomerBootstrap>
-        </AdminProductBootstrap>
+        <AdminCustomerBootstrap>
+          <AdminOrderBootstrap>
+            <AdminBusinessSettingsBootstrap>{content}</AdminBusinessSettingsBootstrap>
+          </AdminOrderBootstrap>
+        </AdminCustomerBootstrap>
       )}
     </AdminAuthGuard>
   );

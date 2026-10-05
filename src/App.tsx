@@ -3,9 +3,6 @@ import { AdminLayout } from './admin/layout/AdminLayout';
 import { AdminDashboard } from './admin/pages/AdminDashboard';
 import { AdminOrders } from './admin/pages/AdminOrders';
 import { AdminCustomers } from './admin/pages/AdminCustomers';
-import { AdminFinance } from './admin/pages/AdminFinance';
-import { AdminProjection } from './admin/pages/AdminProjection';
-import { AdminAnalytics } from './admin/pages/AdminAnalytics';
 import { AdminMarketing } from './admin/pages/AdminMarketing';
 import { AdminSettings } from './admin/pages/AdminSettings';
 import { AdminStore } from './admin/pages/AdminStore';
@@ -119,9 +116,9 @@ function App() {
           <Route path="inventario" element={<Navigate to="/admin" replace />} />
           <Route path="pedidos" element={<AdminOrders />} />
           <Route path="clientes" element={<AdminCustomers />} />
-          <Route path="finanzas" element={<AdminFinance />} />
-          <Route path="proyeccion" element={<AdminProjection />} />
-          <Route path="analitica" element={<AdminAnalytics />} />
+          <Route path="finanzas" element={<Navigate to="/admin" replace />} />
+          <Route path="proyeccion" element={<Navigate to="/admin" replace />} />
+          <Route path="analitica" element={<Navigate to="/admin" replace />} />
           <Route path="marketing" element={<AdminMarketing />} />
           <Route path="tienda" element={<AdminStore />} />
           <Route path="configuracion" element={<AdminSettings />} />
