@@ -6,10 +6,6 @@ import { promotionalPrice } from "../utils/storefront";
 import { canPurchase, hasKnownPrice } from "../services/chopify/catalog";
 import { getProductRealCost } from "../utils/productMetrics";
 import {
-  getOrderEstimatedCost,
-  getOrderEstimatedProfit,
-} from "../utils/orderMetrics";
-import {
   ArrowLeft,
   ArrowRight,
   Check,
@@ -257,14 +253,12 @@ export function Checkout() {
         discount: 0,
         paymentStatus: "pending",
         orderStatus: "new",
-        estimatedCost: 0,
-        estimatedProfit: 0,
+        estimatedCost: null,
+        estimatedProfit: null,
         notes: [],
         inventoryCommitted: false,
       };
       order.total = order.subtotal + (shippingCost ?? 0);
-      order.estimatedCost = getOrderEstimatedCost(order);
-      order.estimatedProfit = getOrderEstimatedProfit(order);
       const saved = await saveOrder(order);
       clearCart();
       navigate(`/pedido-confirmado?pedido=${encodeURIComponent(saved.id)}`);

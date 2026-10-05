@@ -50,8 +50,8 @@ export interface Order {
   shippingCost: number | null;
   discount: number;
   total: number;
-  estimatedCost: number;
-  estimatedProfit: number;
+  estimatedCost: number | null;
+  estimatedProfit: number | null;
   notes: string[];
   inventoryCommitted: boolean;
 }
