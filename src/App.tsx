@@ -1,9 +1,6 @@
-import { AdminProductEditor } from './admin/pages/AdminProductEditor';
 import { AdminCustomerDetail } from './admin/pages/AdminCustomerDetail';
 import { AdminLayout } from './admin/layout/AdminLayout';
 import { AdminDashboard } from './admin/pages/AdminDashboard';
-import { AdminProducts } from './admin/pages/AdminProducts';
-import { AdminInventory } from './admin/pages/AdminInventory';
 import { AdminOrders } from './admin/pages/AdminOrders';
 import { AdminCustomers } from './admin/pages/AdminCustomers';
 import { AdminFinance } from './admin/pages/AdminFinance';
@@ -14,6 +11,7 @@ import { AdminSettings } from './admin/pages/AdminSettings';
 import { AdminStore } from './admin/pages/AdminStore';
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
 } from "react-router-dom";
@@ -113,12 +111,12 @@ function App() {
 
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="productos/nuevo" element={<AdminProductEditor />} />
-          <Route path="productos/:id" element={<AdminProductEditor />} />
+          <Route path="productos/nuevo" element={<Navigate to="/admin" replace />} />
+          <Route path="productos/:id" element={<Navigate to="/admin" replace />} />
           <Route path="pedidos/:id" element={<AdminOrders />} />
           <Route path="clientes/:id" element={<AdminCustomerDetail />} />
-          <Route path="productos" element={<AdminProducts />} />
-          <Route path="inventario" element={<AdminInventory />} />
+          <Route path="productos" element={<Navigate to="/admin" replace />} />
+          <Route path="inventario" element={<Navigate to="/admin" replace />} />
           <Route path="pedidos" element={<AdminOrders />} />
           <Route path="clientes" element={<AdminCustomers />} />
           <Route path="finanzas" element={<AdminFinance />} />

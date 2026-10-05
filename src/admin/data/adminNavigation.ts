@@ -1,7 +1,5 @@
 import {
   LayoutDashboard,
-  Package,
-  Boxes,
   ShoppingBag,
   Users,
   Wallet,
@@ -13,27 +11,7 @@ import {
 } from "lucide-react";
 export const adminNavigation = [
   { path: "", title: "Dashboard", icon: LayoutDashboard, group: "ESPACIO DE TRABAJO" },
-  {
-    path: "productos",
-    title: "Productos",
-    icon: Package,
-    group: "CATÁLOGO",
-    description:
-      "Gestiona catálogo, precios, costos, stock, imágenes y estados.",
-    features: [
-      "Catálogo y estados",
-      "Precios y costos",
-      "Imágenes de producto",
-    ],
-  },
-  {
-    path: "inventario",
-    title: "Inventario",
-    icon: Boxes,
-    group: "CATÁLOGO",
-    description: "Controla entradas, salidas, stock mínimo y valorización.",
-    features: ["Entradas y salidas", "Alertas de stock", "Valorización"],
-  },
+
   {
     path: "pedidos",
     title: "Pedidos",
