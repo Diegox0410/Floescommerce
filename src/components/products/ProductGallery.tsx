@@ -49,6 +49,10 @@ export function ProductGallery({
             src={selectedImage}
             alt={name}
             className="product-gallery-image"
+            decoding="async"
+            fetchPriority="high"
+            width={900}
+            height={1125}
           />
         ) : (
           <div className="product-detail-placeholder">
@@ -82,6 +86,9 @@ export function ProductGallery({
                 src={url}
                 alt=""
                 loading="lazy"
+                decoding="async"
+                width={180}
+                height={225}
               />
             </button>
           ))}

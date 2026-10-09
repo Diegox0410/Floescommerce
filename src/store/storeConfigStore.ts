@@ -25,7 +25,7 @@ export const defaultStoreConfig: StoreConfig = {
       { id: "benefits", type: "benefits", enabled: false, sortOrder: 6 },
       { id: "social", type: "social", enabled: true, sortOrder: 7 },
     ],
-    hero: { enabled: true, eyebrow: "CONFECCIÓN ECUATORIANA", title: "FLOES.ec", description: "Confección que viste tu profesión.", primaryButtonLabel: "Ver catálogo", primaryButtonHref: "/catalogo", secondaryButtonLabel: "Conocer FLOES", secondaryButtonHref: "#confeccion-floes", image: "/images/floes/hero/confeccion-floes.jpeg" },
+    hero: { enabled: true, eyebrow: "PREMIUM MEDICAL FASHION", title: "FLOES.ec", description: "Tu vocación tiene estilo.", primaryButtonLabel: "Descubrir colección", primaryButtonHref: "/catalogo", secondaryButtonLabel: "Conocer FLOES", secondaryButtonHref: "#confeccion-floes", image: "/images/floes/hero/confeccion-floes.jpeg" },
     brandStory: { eyebrow: "CONFECCIÓN FLOES", title: "Diseños para trabajar. Modelos para sentirte tú.", description: "Uniformes, textiles y confeccionados presentados con claridad para que encuentres el modelo, la tela, el color y la talla que necesitas.", image: "/images/floes/editorial/confeccion-posterior.jpeg", imageAlt: "Vista posterior de una confección FLOES", buttonLabel: "Explorar el catálogo", buttonHref: "/catalogo" },
     campaign: { enabled: true, eyebrow: "SELECCIÓN FLOES", title: "Productos para descubrir.", description: "Explora novedades y precios especiales seleccionados para ti.", image: "", buttonLabel: "Ver ofertas", buttonHref: "/catalogo?filter=ofertas" },
     benefits: [

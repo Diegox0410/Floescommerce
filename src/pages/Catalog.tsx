@@ -12,7 +12,8 @@ import { CatalogGrid } from "../components/catalog/CatalogGrid";
 
 import { useProductStore } from "../store/productStore";
 import { slugify } from "../utils/normalization";
-import { hasKnownPrice } from "../services/chopify/catalog";
+import { hasKnownPrice, catalogPrice } from "../services/chopify/catalog";
+import { StoreSEO } from "../components/common/StoreSEO";
 
 export function Catalog() {
   const products = useProductStore(state => state.products);
@@ -38,12 +39,17 @@ export function Catalog() {
 
   const [sort, setSort] =
     useState("featured");
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [colorFilter, setColorFilter] = useState("");
+  const colors = [...new Set(products.filter((product) => product.active).flatMap((product) => product.colors.map((color) => color.name)))];
 
   const filteredProducts =
     useMemo(() => {
       let result = [
         ...products.filter(p => p.active),
       ];
+      if (availableOnly) result = result.filter((product) => product.inStock === true);
+      if (colorFilter) result = result.filter((product) => product.variants.some((variant) => variant.active && slugify(variant.color ?? "") === slugify(colorFilter)));
 
       /* =====================================================
          CATEGORY FILTER
@@ -74,10 +80,7 @@ export function Catalog() {
         result =
           result.filter(
             (product) =>
-              typeof product.oldPrice ===
-                "number" &&
-              product.oldPrice >
-                product.price
+              catalogPrice(product) < product.price || product.variants.some((variant) => catalogPrice(product, variant) < (variant.price ?? product.price))
           );
       }
 
@@ -129,20 +132,16 @@ export function Catalog() {
         search.trim()
       ) {
         const query =
-          search
-            .trim()
-            .toLowerCase();
+          slugify(search.trim());
 
         result =
           result.filter(
             (product) => {
               const productName =
-                product.name
-                  .toLowerCase();
+                slugify(product.name);
 
               const productCategory =
-                product.category
-                  .toLowerCase();
+                slugify(product.category);
 
               const productBadge =
                 product.badge
@@ -158,7 +157,7 @@ export function Catalog() {
                 ) ||
                 productBadge.includes(
                   query
-                )
+                ) || product.colors.some((color) => slugify(color.name).includes(query))
               );
             }
           );
@@ -173,7 +172,7 @@ export function Catalog() {
           result.sort(
             (a, b) => {
               if (hasKnownPrice(a) !== hasKnownPrice(b)) return hasKnownPrice(a) ? -1 : 1;
-              return a.price - b.price;
+              return catalogPrice(a) - catalogPrice(b);
             }
           );
           break;
@@ -182,7 +181,7 @@ export function Catalog() {
           result.sort(
             (a, b) => {
               if (hasKnownPrice(a) !== hasKnownPrice(b)) return hasKnownPrice(a) ? -1 : 1;
-              return b.price - a.price;
+              return catalogPrice(b) - catalogPrice(a);
             }
           );
           break;
@@ -221,6 +220,8 @@ export function Catalog() {
       filterParam,
       search,
       sort,
+      availableOnly,
+      colorFilter,
     ]);
 
   /* =======================================================
@@ -343,6 +344,7 @@ export function Catalog() {
 
   return (
     <main>
+      <StoreSEO />
       <PageHeader
         eyebrow={eyebrow}
         title={title}
@@ -368,6 +370,10 @@ export function Catalog() {
               filteredProducts.length
             }
           />
+          <div className="catalog-refinements">
+            {colors.length > 0 && <label>Color <select value={colorFilter} onChange={(event) => setColorFilter(event.target.value)}><option value="">Todos los colores</option>{colors.map((color) => <option key={color}>{color}</option>)}</select></label>}
+            <label className="availability-filter"><input type="checkbox" checked={availableOnly} onChange={(event) => setAvailableOnly(event.target.checked)} /> Disponibles para pedido</label>
+          </div>
 
           <div className="catalog-layout">
 

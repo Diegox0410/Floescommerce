@@ -444,15 +444,11 @@ export function AdminOrderDetail() {
             ],
             [
               "Costo estimado",
-              money(
-                order.estimatedCost,
-              ),
+              order.estimatedCost === null ? "No disponible" : money(order.estimatedCost),
             ],
             [
               "Utilidad estimada",
-              money(
-                order.estimatedProfit,
-              ),
+              order.estimatedProfit === null ? "No disponible" : money(order.estimatedProfit),
             ],
           ].map(
             ([label, value]) => (

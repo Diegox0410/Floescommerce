@@ -9,10 +9,7 @@ import type { Product } from "../../types/product";
 
 import { useCartStore } from "../../store/cartStore";
 
-import { useMarketingStore } from "../../store/marketingStore";
-
-import { promotionalPrice } from "../../utils/storefront";
-import { canPurchase, hasKnownPrice } from "../../services/chopify/catalog";
+import { canPurchase, hasKnownPrice, catalogPrice } from "../../services/chopify/catalog";
 
 interface ProductCardProps {
   product: Product;
@@ -25,14 +22,9 @@ export function ProductCard({
     (state) => state.addItem,
   );
 
-  const promotions = useMarketingStore(
-    (state) => state.promotions,
-  );
-
-  const price = promotionalPrice(
-    product,
-    promotions,
-  );
+  const price = catalogPrice(product);
+  const href = `/producto/${product.slug || product.id}`;
+  const colorCount = new Set(product.variants.filter((variant) => variant.active).map((variant) => variant.color).filter(Boolean)).size;
 
   const handleAddToCart = () => {
     addItem(product, 1);
@@ -42,7 +34,7 @@ export function ProductCard({
   return (
     <article className="product-card">
       <Link
-        to={`/producto/${product.id}`}
+        to={href}
         className="product-media"
         aria-label={`Ver ${product.name}`}
       >
@@ -51,6 +43,9 @@ export function ProductCard({
             src={product.image}
             alt={product.name}
             loading="lazy"
+            decoding="async"
+            width={600}
+            height={750}
           />
         ) : (
           <div className="product-image-placeholder">
@@ -77,10 +72,11 @@ export function ProductCard({
         </span>
 
         <Link
-          to={`/producto/${product.id}`}
+          to={href}
         >
           <h3>{product.name}</h3>
         </Link>
+        {colorCount > 0 && <p className="product-color-count">{colorCount} color{colorCount === 1 ? "" : "es"} en catálogo</p>}
 
         {product.colors.some((color) => color.hex) && (
           <div className="product-color-preview" aria-label={`Colores disponibles para ${product.name}`}>
@@ -101,7 +97,7 @@ export function ProductCard({
         <div className="product-footer">
           {knownPrice ? <div className="product-pricing">
             <strong>
-              ${price.toFixed(2)}
+              {product.variants.length ? "Desde " : ""}${price.toFixed(2)}
             </strong>
 
             {(price < product.price ||
@@ -117,7 +113,7 @@ export function ProductCard({
             )}
           </div> : <div className="product-pricing"><strong>Precio por confirmar</strong></div>}
 
-          {product.variants.length || !canPurchase(product) ? <Link className="product-add-button" to={`/producto/${product.id}`}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
+          {product.variants.length || !canPurchase(product) ? <Link className="product-add-button" to={href}><ArrowUpRight size={17} /><span>Ver modelo</span></Link> : <button
             className="product-add-button"
             type="button"
             onClick={handleAddToCart}

@@ -1,4 +1,5 @@
-import { activeCategories, useCategoryStore } from "../../store/categoryStore";
+import { useProductStore } from "../../store/productStore";
+import { slugify } from "../../utils/normalization";
 
 interface CategoryFilterProps {
   selectedCategory: string;
@@ -9,8 +10,8 @@ export function CategoryFilter({
   selectedCategory,
   onSelectCategory,
 }: CategoryFilterProps) {
-  const storedCategories = useCategoryStore((s) => s.categories);
-  const categories = activeCategories(storedCategories);
+  const products = useProductStore((s) => s.products);
+  const categories = [...new Set(products.filter((p) => p.active).map((p) => p.category))].map((name) => ({ id: slugify(name), slug: slugify(name), name }));
   return (
     <aside className="catalog-sidebar">
 

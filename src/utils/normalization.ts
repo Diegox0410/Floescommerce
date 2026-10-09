@@ -51,8 +51,11 @@ const normalizeVariants = (value: unknown): ProductVariant[] =>
     return {
       id: text(item.id, crypto.randomUUID()), sku: text(item.sku),
       size: text(item.size) || undefined, color: text(item.color) || undefined,
+      sizes: strings(item.sizes),
+      images: strings(item.images),
       measurement: text(item.measurement) || undefined, material: text(item.material) || undefined,
       price: typeof item.price === "number" ? safeNumber(item.price) : undefined,
+      promotionalPrice: typeof item.promotionalPrice === "number" ? safeNumber(item.promotionalPrice) : undefined,
       productCost: typeof item.productCost === "number" ? safeNumber(item.productCost) : undefined,
       stock: Math.floor(safeNumber(item.stock)), minimumStock: Math.floor(safeNumber(item.minimumStock)),
       active: flag(item.active, true),
@@ -60,6 +63,12 @@ const normalizeVariants = (value: unknown): ProductVariant[] =>
       availabilityStatus: ["AVAILABLE", "OUT_OF_STOCK", "NOT_CONFIGURED"].includes(text(item.availabilityStatus)) ? text(item.availabilityStatus) as ProductVariant["availabilityStatus"] : undefined,
       available: typeof item.available === "boolean" ? item.available : undefined,
       availableQuantity: item.availableQuantity === null ? null : typeof item.availableQuantity === "number" ? Math.floor(safeNumber(item.availableQuantity)) : undefined,
+      sizeAvailability: Array.isArray(item.sizeAvailability) ? item.sizeAvailability.map((entry) => {
+        const size = record(entry);
+        const availableQuantity = size.availableQuantity === null ? null : typeof size.availableQuantity === "number" ? Math.max(0, Math.floor(safeNumber(size.availableQuantity))) : null;
+        const availabilityStatus = availableQuantity === null ? "NOT_CONFIGURED" as const : availableQuantity > 0 ? "AVAILABLE" as const : "OUT_OF_STOCK" as const;
+        return { size: text(size.size).trim().toUpperCase(), available: availableQuantity !== null && availableQuantity > 0, availableQuantity, availabilityStatus };
+      }).filter((entry) => entry.size) : undefined,
       fulfillmentMode: ["STOCK", "MADE_TO_ORDER", "SERVICE", "DIGITAL", "HYBRID"].includes(text(item.fulfillmentMode)) ? text(item.fulfillmentMode) as ProductVariant["fulfillmentMode"] : undefined,
     };
   }).filter((variant) => variant.id && variant.sku);
@@ -68,7 +77,7 @@ const normalizeSizeGuide = (value: unknown): SizeGuide | undefined => {
   const rows = (Array.isArray(guide.rows) ? guide.rows : []).map((entry) => {
     const row = record(entry); return { label: text(row.label), values: strings(row.values) };
   }).filter((row) => row.label);
-  return columns.length || rows.length ? { title: text(guide.title) || undefined, columns, rows, note: text(guide.note) || undefined } : undefined;
+  return columns.length || rows.length ? { title: text(guide.title) || undefined, columns, rows, note: text(guide.note) || undefined, measurement: guide.measurement === "FLAT_GARMENT_CM" ? "FLAT_GARMENT_CM" : undefined } : undefined;
 };
 export function normalizeProduct(value: unknown): Product {
   const p = record(value);
@@ -83,6 +92,8 @@ export function normalizeProduct(value: unknown): Product {
     description: text(p.description, "Modelo confeccionado para profesionales de salud, belleza y bienestar."),
     shortDescription: text(p.shortDescription),
     price: safeNumber(p.price),
+    promotionalPrice: typeof p.promotionalPrice === "number" ? safeNumber(p.promotionalPrice) : undefined,
+    currency: text(p.currency) || undefined,
     oldPrice:
       typeof p.oldPrice === "number" ? safeNumber(p.oldPrice) : undefined,
     productCost: safeNumber(p.productCost),
@@ -108,6 +119,11 @@ export function normalizeProduct(value: unknown): Product {
     audience: (["mujer", "hombre", "unisex", "infantil", "otro"].includes(text(p.audience)) ? text(p.audience) : undefined) as ProductAudience | undefined,
     fabric: text(p.fabric) || undefined,
     material: text(p.material) || undefined,
+    characteristics: strings(p.characteristics),
+    sizeRecommendation: text(p.sizeRecommendation) || undefined,
+    preparationTime: text(p.preparationTime) || undefined,
+    deliveryType: text(p.deliveryType) || undefined,
+    exchangePolicy: Object.keys(record(p.exchangePolicy)).length ? { allowed: typeof record(p.exchangePolicy).allowed === "boolean" ? record(p.exchangePolicy).allowed as boolean : null, conditions: text(record(p.exchangePolicy).conditions) } : undefined,
     colors: normalizeColors(p.colors),
     sizes: strings(p.sizes),
     variants: normalizeVariants(p.variants),

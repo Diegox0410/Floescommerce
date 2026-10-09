@@ -13,6 +13,7 @@ export async function createChopifyOrder(draft: Order): Promise<Order> {
       lines: draft.items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
+        size: item.size,
         quantity: item.quantity,
       })),
     }),
@@ -40,8 +41,8 @@ export async function createChopifyOrder(draft: Order): Promise<Order> {
     discount: 0,
     paymentStatus: "pending",
     orderStatus: "new",
-    estimatedCost: 0,
-    estimatedProfit: 0,
+    estimatedCost: null,
+estimatedProfit: null,
     inventoryCommitted: false,
     createdAt: now,
     updatedAt: now,

@@ -1,14 +1,8 @@
 import { useCartItems } from "../store/useCartItems";
 import { useProductStore } from "../store/productStore";
-import { useMarketingStore } from "../store/marketingStore";
 import { useStoreConfigStore } from "../store/storeConfigStore";
-import { promotionalPrice } from "../utils/storefront";
-import { canPurchase, hasKnownPrice } from "../services/chopify/catalog";
+import { availableQuantityForSize, canPurchase, hasKnownPrice, catalogPrice, variantSizes } from "../services/chopify/catalog";
 import { getProductRealCost } from "../utils/productMetrics";
-import {
-  getOrderEstimatedCost,
-  getOrderEstimatedProfit,
-} from "../utils/orderMetrics";
 import {
   ArrowLeft,
   ArrowRight,
@@ -59,7 +53,6 @@ export function Checkout() {
   // FLOES no define una restricción geográfica para efectivo todavía.
   // Conservamos este indicador para los controles heredados sin bloquear ciudades.
   const isGuayaquil = true;
-  const promotions = useMarketingStore((s) => s.promotions);
   const navigate = useNavigate();
 
   const items = useCartItems();
@@ -211,7 +204,7 @@ export function Checkout() {
 
     try {
       const current = useProductStore.getState().products;
-      const snapshots = items.map(({ product, quantity, variant }) => {
+      const snapshots = items.map(({ product, quantity, variant, size }) => {
         const latest = current.find((p) => p.id === product.id);
         if (
           !latest ||
@@ -223,20 +216,22 @@ export function Checkout() {
           );
         const latestVariant = variant ? latest.variants.find((entry) => entry.id === variant.id && entry.active) : undefined;
         if (variant && !latestVariant) throw new Error(`${product.name}: la variante seleccionada ya no está disponible.`);
+        if (latestVariant && variantSizes(latestVariant).length && !variantSizes(latestVariant).includes(size ?? latestVariant.size ?? "")) throw new Error(`${product.name}: selecciona una talla vigente.`);
         if (!hasKnownPrice(latest, latestVariant)) throw new Error(`${product.name} todavía no tiene un precio publicado.`);
-        if (!canPurchase(latest, latestVariant)) throw new Error(`${product.name} ya no está disponible.`);
-        if (latestVariant?.fulfillmentMode === "STOCK" && latestVariant.availableQuantity !== null && latestVariant.availableQuantity !== undefined && latestVariant.availableQuantity < quantity) throw new Error(`${product.name}: no hay unidades suficientes.`);
+        if (!canPurchase(latest, latestVariant, size)) throw new Error(`${product.name} ya no está disponible en la talla seleccionada.`);
+        const sizeQuantity = latestVariant?.fulfillmentMode === "STOCK" ? availableQuantityForSize(latestVariant, size) : null;
+        if (latestVariant?.fulfillmentMode === "STOCK" && sizeQuantity !== null && sizeQuantity !== undefined && sizeQuantity < quantity) throw new Error(`${product.name}: no hay unidades suficientes en la talla seleccionada.`);
         return {
           productId: latest.id,
           name: latest.name,
           sku: latestVariant?.sku ?? latest.sku,
-          price: latestVariant?.price ?? promotionalPrice(latest, promotions),
+          price: catalogPrice(latest, latestVariant),
           cost: latestVariant?.productCost ?? getProductRealCost(latest),
           quantity,
           variantId: latestVariant?.id,
           variantSku: latestVariant?.sku,
-          variantLabel: latestVariant ? [latestVariant.color, latestVariant.size].filter(Boolean).join(" / ") : undefined,
-          size: latestVariant?.size,
+          variantLabel: latestVariant ? [latestVariant.color, size || latestVariant.size].filter(Boolean).join(" / ") : undefined,
+          size: size || latestVariant?.size,
           color: latestVariant?.color,
           measurement: latestVariant?.measurement,
           material: latestVariant?.material,
@@ -257,14 +252,12 @@ export function Checkout() {
         discount: 0,
         paymentStatus: "pending",
         orderStatus: "new",
-        estimatedCost: 0,
-        estimatedProfit: 0,
+        estimatedCost: null,
+        estimatedProfit: null,
         notes: [],
         inventoryCommitted: false,
       };
       order.total = order.subtotal + (shippingCost ?? 0);
-      order.estimatedCost = getOrderEstimatedCost(order);
-      order.estimatedProfit = getOrderEstimatedProfit(order);
       const saved = await saveOrder(order);
       clearCart();
       navigate(`/pedido-confirmado?pedido=${encodeURIComponent(saved.id)}`);
@@ -580,7 +573,7 @@ export function Checkout() {
             </div>
 
             <div className="checkout-summary-products">
-              {items.map(({ product, quantity: itemQuantity }) => {
+              {items.map(({ product, quantity: itemQuantity, variant, size, lineId }) => {
                 const initials = product.name
                   .split(" ")
                   .map((word) => word.charAt(0))
@@ -588,7 +581,7 @@ export function Checkout() {
                   .join("");
 
                 return (
-                  <div className="checkout-summary-product" key={product.id}>
+                  <div className="checkout-summary-product" key={lineId}>
                     <div className="checkout-summary-media">
                       <span>{initials}</span>
 
@@ -599,10 +592,11 @@ export function Checkout() {
                       <span>{product.category}</span>
 
                       <strong>{product.name}</strong>
+                      {variant && <small>{[variant.color, size || variant.size].filter(Boolean).join(" / ")}</small>}
                     </div>
 
                     <div className="checkout-summary-product-price">
-                      ${(product.price * itemQuantity).toFixed(2)}
+                      ${(catalogPrice(product, variant) * itemQuantity).toFixed(2)}
                     </div>
                   </div>
                 );

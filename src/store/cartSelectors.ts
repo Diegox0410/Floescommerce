@@ -1,4 +1,5 @@
 import type { CartItem } from "./cartStore";
+import { catalogPrice } from "../services/chopify/catalog";
 
 export function getCartQuantity(
   items: CartItem[]
@@ -16,7 +17,7 @@ export function getCartSubtotal(
   return items.reduce(
     (total, item) =>
       total +
-      (item.variant?.price ?? item.product.price) *
+      catalogPrice(item.product, item.variant) *
         item.quantity,
     0
   );

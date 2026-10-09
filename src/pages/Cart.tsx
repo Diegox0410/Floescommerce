@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 
 import { useCartItems } from "../store/useCartItems";
+import { availableQuantityForSize, catalogPrice } from "../services/chopify/catalog";
 import { useCartStore } from "../store/cartStore";
 import { useStoreConfigStore } from "../store/storeConfigStore";
 import { WhatsAppCTA } from "../components/common/WhatsAppCTA";
@@ -129,7 +130,9 @@ export function Cart() {
                 quantity: itemQuantity,
                 lineId,
                 variant,
+                size,
               }) => {
+                const maxQuantity = variant?.fulfillmentMode === "STOCK" ? availableQuantityForSize(variant, size) : null;
                 const initials =
                   product.name
                     .split(" ")
@@ -142,7 +145,7 @@ export function Cart() {
                 return (
                   <article
                     className="cart-page-item"
-                    key={product.id}
+                    key={lineId}
                   >
                     <Link
                       to={`/producto/${product.id}`}
@@ -178,11 +181,12 @@ export function Cart() {
 
                           <p>
                             $
-                            {product.price.toFixed(
+                            {catalogPrice(product, variant).toFixed(
                               2,
                             )}{" "}
                             por unidad
                           </p>
+                          {variant && <small>{[variant.color, size || variant.size].filter(Boolean).join(" / ")}</small>}
                         </div>
 
                         <button
@@ -223,6 +227,7 @@ export function Cart() {
                                 lineId,
                               )
                             }
+                            disabled={maxQuantity !== null && maxQuantity !== undefined && itemQuantity >= maxQuantity}
                             aria-label="Aumentar cantidad"
                           >
                             <Plus size={15} />
@@ -232,7 +237,7 @@ export function Cart() {
                         <strong>
                           $
                           {(
-                            (variant?.price ?? product.price) *
+                            catalogPrice(product, variant) *
                             itemQuantity
                           ).toFixed(2)}
                         </strong>

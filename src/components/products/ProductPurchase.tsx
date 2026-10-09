@@ -1,39 +1,65 @@
-import { Minus, Plus, ShoppingBag } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
+import { useState } from "react";
 import type { Product } from "../../types/product";
 import { useCartStore } from "../../store/cartStore";
 import { WhatsAppCTA } from "../common/WhatsAppCTA";
-import { canPurchase, hasKnownPrice } from "../../services/chopify/catalog";
+import { availableQuantityForSize, canPurchase, hasKnownPrice, resolveVariant, sizeAvailabilityFor, variantSizes } from "../../services/chopify/catalog";
+import { slugify } from "../../utils/normalization";
 
-export function ProductPurchase({ product, color: controlledColor, onColorChange }: { product: Product; color?: string; onColorChange?: (color: string) => void }) {
-  const variants = useMemo(() => product.variants.filter((variant) => variant.active), [product.variants]);
-  const sizes = [...new Set(variants.map((variant) => variant.size).filter(Boolean))] as string[];
-  const colors = [...new Set(variants.map((variant) => variant.color).filter(Boolean))] as string[];
-  const [size, setSize] = useState(sizes.length === 1 ? sizes[0] : "");
-  const [uncontrolledColor, setUncontrolledColor] = useState(colors.length === 1 ? colors[0] : "");
-  const color = controlledColor ?? uncontrolledColor;
-  const selectColor = (value: string) => {
-    setUncontrolledColor(value);
-    onColorChange?.(value);
-  };
+export function ProductPurchase({ product, color, size, onColorChange, onSizeChange }: {
+  product: Product; color: string; size: string;
+  onColorChange: (color: string) => void; onSizeChange: (size: string) => void;
+}) {
+  const variants = product.variants.filter((variant) => variant.active);
+  const colors = [...new Set(variants.map((variant) => variant.color).filter((value): value is string => Boolean(value)))];
+  const sizes = [...new Set(variants.filter((variant) => !color || slugify(variant.color ?? "") === slugify(color)).flatMap(variantSizes))];
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
-  const selected = variants.find((variant) => (!sizes.length || variant.size === size) && (!colors.length || variant.color === color));
-  const missing = variants.length > 0 && !selected;
-  const colorEnabled = (value: string) => variants.some((variant) => variant.color === value && (!size || variant.size === size));
-  const sizeEnabled = (value: string) => variants.some((variant) => variant.size === value && (!color || variant.color === color));
-  const colorData = (value: string) => product.colors.find((entry) => entry.name === value);
-  // Regla actual centralizada: hasta definir la política de confección bajo pedido,
-  // una variante con stock exactamente cero conserva el bloqueo existente.
-  const selectedVariantIsPurchasable = selected ? canPurchase(product, selected) : canPurchase(product);
-  const priceKnown = selected ? hasKnownPrice(product, selected) : hasKnownPrice(product);
+  const selected = resolveVariant(product, color, size);
+  const missing = variants.length > 0 && ((!color && colors.length > 0) || (!size && sizes.length > 0) || !selected);
+  const purchasable = !missing && canPurchase(product, selected, size);
+  const priceKnown = hasKnownPrice(product, selected);
+  const maximum = selected?.fulfillmentMode === "STOCK" ? availableQuantityForSize(selected, size) : null;
+  const safeQuantity = maximum !== null && maximum !== undefined ? Math.min(quantity, Math.max(1, maximum)) : quantity;
+  const selectedSizeAvailability = selected && size ? sizeAvailabilityFor(selected, size) : undefined;
+  const inventoryUnconfirmed = selected?.fulfillmentMode === "STOCK" && (selectedSizeAvailability?.availabilityStatus === "NOT_CONFIGURED" || (!selectedSizeAvailability && selected.availabilityStatus === "NOT_CONFIGURED"));
+  const selectColor = (value: string) => {
+    onColorChange(value);
+    if (size && !variants.some((variant) => variant.color === value && variantSizes(variant).includes(size))) onSizeChange("");
+    setAdded(false);
+  };
 
   return <div className="product-purchase">
-    {colors.length > 0 && <fieldset className="variant-selector color-selector"><legend>Color {color && <strong>{color}</strong>}</legend><div className="variant-options">{colors.map((value) => { const data = colorData(value); return <button type="button" key={value} disabled={!colorEnabled(value)} className={`${color === value ? "active" : ""}${data?.hex ? " has-swatch" : ""}`} onClick={() => selectColor(value)} aria-label={`Color ${value}`} title={value}>{data?.hex && <span className="color-swatch" style={{ backgroundColor: data.hex }} aria-hidden="true" />}<span>{value}</span></button>; })}</div></fieldset>}
-    {sizes.length > 0 && <fieldset className="variant-selector"><legend>Talla</legend><div className="variant-options">{sizes.map((value) => <button type="button" key={value} disabled={!sizeEnabled(value)} className={size === value ? "active" : ""} onClick={() => setSize(value)}>{value}</button>)}</div></fieldset>}
-    <div className="product-quantity"><span>Cantidad</span><div className="product-quantity-control"><button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Disminuir cantidad" disabled={quantity <= 1}><Minus size={16} /></button><strong>{quantity}</strong><button type="button" onClick={() => setQuantity((value) => value + 1)} aria-label="Aumentar cantidad"><Plus size={16} /></button></div></div>
-    <div className="product-purchase-actions"><button className="product-main-add" type="button" disabled={missing || !selectedVariantIsPurchasable} onClick={() => addItem(product, quantity, selected)}><ShoppingBag size={18} />{missing ? "Selecciona talla y color" : !priceKnown ? "Precio por confirmar" : !selectedVariantIsPurchasable ? "No disponible" : "Agregar al carrito"}</button></div>
-    <p className="product-purchase-note">{!priceKnown ? "FLOES aún no ha publicado el precio. Puedes consultar este modelo por WhatsApp, pero no se agregará un valor ficticio al carrito." : selected ? `${selected.sku} · ${[selected.color, selected.size].filter(Boolean).join(" / ")}` : variants.length ? "Elige una combinación disponible." : `Estás seleccionando ${quantity} unidad${quantity !== 1 ? "es" : ""} de ${product.name}.`}</p>
-    <WhatsAppCTA productName={product.name} className="product-whatsapp" />
+    {colors.length > 0 && <fieldset className="variant-selector color-selector">
+      <legend>Color <strong>{color || "Elige tu color"}</strong></legend>
+      <div className="variant-options">{colors.map((value) => {
+        const data = product.colors.find((entry) => slugify(entry.name) === slugify(value));
+        const colorVariants = variants.filter((variant) => slugify(variant.color ?? "") === slugify(value));
+        const available = colorVariants.some((variant) => canPurchase(product, variant));
+        const unconfirmed = colorVariants.some((variant) => variant.availabilityStatus === "NOT_CONFIGURED");
+        const statusLabel = available ? "" : unconfirmed ? ", inventario por confirmar" : ", no disponible";
+        return <button type="button" key={value} className={`${color === value ? "active" : ""}${!available ? " unavailable" : ""}`} onClick={() => selectColor(value)} aria-pressed={color === value} aria-label={`${value}${statusLabel}`} title={`${value}${statusLabel}`}>
+          {data?.hex && <span className="color-swatch" style={{ backgroundColor: data.hex }} aria-hidden="true" />}
+          <span>{value}</span>
+        </button>;
+      })}</div>
+    </fieldset>}
+    {sizes.length > 0 && <fieldset className="variant-selector size-selector"><legend>Talla <a href="#guia-tallas">Guía de tallas</a></legend><div className="variant-options">{sizes.map((value) => {
+      const matching = variants.filter((variant) => (!color || slugify(variant.color ?? "") === slugify(color)) && variantSizes(variant).includes(value));
+      const available = matching.some((variant) => canPurchase(product, variant, value));
+      const unconfirmed = matching.some((variant) => sizeAvailabilityFor(variant, value)?.availabilityStatus === "NOT_CONFIGURED" || (!variant.sizeAvailability?.length && variant.availabilityStatus === "NOT_CONFIGURED"));
+      const statusLabel = available ? "" : unconfirmed ? ", inventario por confirmar" : ", no disponible";
+      return <button type="button" key={value} className={`${size === value ? "active" : ""}${!available ? " unavailable" : ""}`} aria-pressed={size === value} aria-label={`${value}${statusLabel}`} onClick={() => { onSizeChange(value); setAdded(false); }}>{value}</button>;
+    })}</div></fieldset>}
+    <div className="product-quantity"><span>Cantidad</span><div className="product-quantity-control">
+      <button type="button" onClick={() => setQuantity(Math.max(1, safeQuantity - 1))} aria-label="Disminuir cantidad" disabled={safeQuantity <= 1}><Minus size={16} /></button>
+      <strong>{safeQuantity}</strong><button type="button" onClick={() => setQuantity(safeQuantity + 1)} disabled={maximum !== null && maximum !== undefined && safeQuantity >= maximum} aria-label="Aumentar cantidad"><Plus size={16} /></button>
+    </div></div>
+    <div className="product-purchase-actions"><button className="product-main-add" type="button" disabled={!purchasable} onClick={() => { addItem(product, safeQuantity, selected, size); setAdded(true); }}>
+      {added ? <Check size={18} /> : <ShoppingBag size={18} />}{added ? "Agregado al pedido" : missing ? "Elige color y talla" : !priceKnown ? "Consultar precio" : inventoryUnconfirmed ? "Disponibilidad por confirmar" : !purchasable ? "No disponible" : "Agregar al pedido"}
+    </button></div>
+    <p className="product-purchase-note" aria-live="polite">{missing ? "Selecciona las opciones de tu modelo para continuar." : !priceKnown ? "Consulta con FLOES el precio de esta selección." : inventoryUnconfirmed ? "Inventario pendiente de confirmar. Consulta por WhatsApp antes de comprar." : !purchasable ? "Esta selección no está disponible para pedido." : selected ? [selected.color, size || selected.size, selected.fulfillmentMode === "MADE_TO_ORDER" ? "Confección bajo pedido" : "Disponible"].filter(Boolean).join(" · ") : "Disponible para pedido."}</p>
+    <WhatsAppCTA productName={product.name} color={color} size={size} className="product-whatsapp" />
   </div>;
 }

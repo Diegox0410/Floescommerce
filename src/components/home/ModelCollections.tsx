@@ -29,7 +29,7 @@ function CollectionSection({ eyebrow, title, products, id, tone = 0 }: {
 export function NewModels() {
   const products = useActiveProducts();
   const recent = [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 4);
-  return <CollectionSection id="nuevos-modelos" eyebrow="NUEVOS MODELOS" title="Conoce lo más reciente de FLOES." products={recent} />;
+  return <CollectionSection id="nuevos-modelos" eyebrow="LA COLECCIÓN" title="Modelos que van contigo." products={recent} />;
 }
 
 export function AudienceCollections() {

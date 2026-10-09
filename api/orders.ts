@@ -61,6 +61,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     return {
       productId: clean(line.productId, 160),
       ...(clean(line.variantId, 160) ? { variantId: clean(line.variantId, 160) } : {}),
+      ...(clean(line.size, 30) ? { size: clean(line.size, 30) } : {}),
       quantity: typeof line.quantity === "number" ? Math.floor(line.quantity) : 0,
     };
   });

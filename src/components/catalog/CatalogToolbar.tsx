@@ -23,7 +23,7 @@ export function CatalogToolbar({
 
       <div className="catalog-result-count">
         <span>{totalProducts}</span>
-        productos
+        modelos
       </div>
 
       <div className="catalog-toolbar-actions">
@@ -34,7 +34,8 @@ export function CatalogToolbar({
           <input
             type="search"
             value={search}
-            placeholder="Buscar productos"
+            placeholder="Buscar modelo o color"
+            aria-label="Buscar modelo o color"
             onChange={(event) =>
               onSearchChange(event.target.value)
             }

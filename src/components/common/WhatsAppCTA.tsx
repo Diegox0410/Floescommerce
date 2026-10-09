@@ -4,6 +4,8 @@ import { whatsappUrl } from "../../utils/storefront";
 
 interface WhatsAppCTAProps {
   productName?: string;
+  color?: string;
+  size?: string;
   message?: string;
   className?: string;
   label?: string;
@@ -11,6 +13,8 @@ interface WhatsAppCTAProps {
 
 export function WhatsAppCTA({
   productName,
+  color,
+  size,
   message,
   className = "",
   label = "Consultar por WhatsApp",
@@ -30,7 +34,7 @@ export function WhatsAppCTA({
   const resolvedMessage =
     message ||
     (productName
-      ? `🛍️✨ ¡Hola, FLOES.ec! Vi el producto "${productName}" en su tienda online y me gustaría recibir más información sobre disponibilidad y compra. 💜 ¿Me pueden ayudar, por favor? 😊`
+      ? `Hola, estoy interesada en ${productName}${color ? ` color ${color}` : ""}${size ? ` talla ${size}` : ""}.`
       : config.contact
           .whatsappMessage);
 

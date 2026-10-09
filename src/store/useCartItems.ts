@@ -1,14 +1,11 @@
 import { useMemo } from "react";
 import { useCartStore } from "./cartStore";
 import { useProductStore } from "./productStore";
-import { useMarketingStore } from "./marketingStore";
-import { promotionalPrice } from "../utils/storefront";
-import { canPurchase } from "../services/chopify/catalog";
+import { canPurchase, variantSizes } from "../services/chopify/catalog";
 // Preserve old cart entries but render current catalog data whenever available.
 export function useCartItems() {
   const items = useCartStore((s) => s.items),
     products = useProductStore((s) => s.products),
-    promotions = useMarketingStore((s) => s.promotions),
     remoteReady = useProductStore((s) => s.remoteReady);
   return useMemo(
     () =>
@@ -17,12 +14,12 @@ export function useCartItems() {
         if (remoteReady && !current) return [];
         const product = current ?? i.product;
         const variant = i.variant ? product.variants.find((entry) => entry.id === i.variant?.id) : undefined;
-        if (remoteReady && !canPurchase(product, variant)) return [];
+        if (remoteReady && (!canPurchase(product, variant, i.size) || (i.variant && !variant) || (variant && variantSizes(variant).length && !variantSizes(variant).includes(i.size ?? variant.size ?? "")))) return [];
         return [{
         ...i,
-        product: { ...product, price: promotionalPrice(product, promotions) },
+        product,
         variant,
       }]; }),
-    [items, products, promotions, remoteReady],
+    [items, products, remoteReady],
   );
 }

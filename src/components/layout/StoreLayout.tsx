@@ -39,27 +39,10 @@ export function StoreLayout() {
       (state) => state.config,
     );
 
-  const seo = config.seo;
-
   const [
     searchOpen,
     setSearchOpen,
   ] = useState(false);
-
-  useEffect(() => {
-    document.title =
-      seo.siteTitle;
-
-    const meta =
-      document.querySelector<HTMLMetaElement>(
-        'meta[name="description"]',
-      );
-
-    if (meta) {
-      meta.content =
-        seo.siteDescription;
-    }
-  }, [seo]);
 
   useEffect(() => {
     const root =

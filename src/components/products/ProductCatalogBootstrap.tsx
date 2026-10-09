@@ -43,7 +43,7 @@ export function ProductCatalogBootstrap({
         cart.items.forEach((item) => {
           const product = catalog.get(item.product.id);
           const variant = item.variant ? product?.variants.find((entry) => entry.id === item.variant?.id) : undefined;
-          if (!product || !canPurchase(product, variant)) cart.removeItem(item.lineId);
+          if (!product || !canPurchase(product, variant, item.size)) cart.removeItem(item.lineId);
         });
       } catch (error) {
         if (!active) return;

@@ -1,4 +1,5 @@
 import { useCartItems } from "../../store/useCartItems";
+import { availableQuantityForSize, catalogPrice } from "../../services/chopify/catalog";
 import {
   ArrowRight,
   Minus,
@@ -152,7 +153,9 @@ export function CartDrawer() {
                     itemQuantity,
                   lineId,
                   variant,
+                  size,
                 }) => {
+                  const maxQuantity = variant?.fulfillmentMode === "STOCK" ? availableQuantityForSize(variant, size) : null;
                   const initials =
                     product.name
                       .split(" ")
@@ -172,7 +175,7 @@ export function CartDrawer() {
                     <article
                       className="cart-drawer-item"
                       key={
-                        product.id
+                        lineId
                       }
                     >
 
@@ -211,6 +214,7 @@ export function CartDrawer() {
                                 }
                               </h3>
                             </Link>
+                            {variant && <small>{[variant.color, size || variant.size].filter(Boolean).join(" / ")}</small>}
                           </div>
 
                           <button
@@ -260,6 +264,7 @@ export function CartDrawer() {
                                   lineId
                                 )
                               }
+                              disabled={maxQuantity !== null && maxQuantity !== undefined && itemQuantity >= maxQuantity}
                             >
                               <Plus
                                 size={13}
@@ -271,7 +276,7 @@ export function CartDrawer() {
                           <strong>
                             $
                             {(
-                              (variant?.price ?? product.price) *
+                              catalogPrice(product, variant) *
                               itemQuantity
                             ).toFixed(
                               2
