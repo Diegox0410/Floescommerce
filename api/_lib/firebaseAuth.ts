@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { createVerify } from "node:crypto";
 
 import { header, type ApiRequest } from "./http.js";

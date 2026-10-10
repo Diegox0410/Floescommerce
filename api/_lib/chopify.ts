@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 const TENANT_ID = "tenant-floes";
 
 type AccessScope = "commerce" | "owner";

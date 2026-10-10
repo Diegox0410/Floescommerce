@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import type { ApiRequest, ApiResponse } from "./_lib/http.js";
 import { header } from "./_lib/http.js";
 import { chopifyProtectionHeaders, publicCatalogUrl } from "./_lib/chopify.js";

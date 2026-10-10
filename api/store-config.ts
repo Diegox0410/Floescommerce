@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import type { ApiRequest, ApiResponse } from "./_lib/http.js";
 import { json } from "./_lib/http.js";
 import { tenantId } from "./_lib/chopify.js";
