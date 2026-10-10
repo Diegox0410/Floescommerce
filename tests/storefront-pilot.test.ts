@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { mapChopifyCatalog } from "../src/services/chopify/catalog.ts";
 import { cartLineId, useCartStore } from "../src/store/cartStore.ts";
 import { getCartSubtotal } from "../src/store/cartSelectors.ts";
-import { whatsappUrl } from "../src/utils/storefront.ts";
+import { productWhatsAppMessage, whatsappUrl } from "../src/utils/storefront.ts";
 
 const [product] = mapChopifyCatalog([{ productId: "test-model", sku: "TEST", name: "Modelo test", slug: "modelo-test", status: "ACTIVE", visibility: "VISIBLE", available: true, price: { amount: 45, currency: "USD" }, pricingStatus: "READY", variants: [{ variantId: "test-vino", sku: "TEST-VINO", color: "Vino", sizes: ["S", "M"], available: true, price: { amount: 45 }, promotionalPrice: { amount: 40 }, pricingStatus: "READY" }] }]);
 
@@ -22,8 +22,9 @@ test("cart preserves separate sizes for one color SKU and uses Chopify promotion
 });
 
 test("WhatsApp URL encodes a contextual model/color/size message", () => {
-  const result = new URL(whatsappUrl("+593 99 000 0000", "Hola, estoy interesada en Modelo test color Vino talla M."));
-  assert.equal(result.searchParams.get("text"), "Hola, estoy interesada en Modelo test color Vino talla M.");
+  const result = new URL(whatsappUrl("+593 99 000 0000", productWhatsAppMessage("Daniela", "Vino", "M")));
+  assert.equal(result.searchParams.get("text"), "Hola, estoy interesada en el Modelo Daniela color Vino talla M.");
+  assert.equal(productWhatsAppMessage("Modelo Daniela", "Vino", "M"), result.searchParams.get("text"));
   assert.equal(result.pathname, "/593990000000");
   assert.equal(whatsappUrl("", "Hola"), "");
 });

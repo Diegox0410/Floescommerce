@@ -20,10 +20,11 @@ export function ProductPurchase({ product, color, size, onColorChange, onSizeCha
   const missing = variants.length > 0 && ((!color && colors.length > 0) || (!size && sizes.length > 0) || !selected);
   const purchasable = !missing && canPurchase(product, selected, size);
   const priceKnown = hasKnownPrice(product, selected);
-  const maximum = selected?.fulfillmentMode === "STOCK" ? availableQuantityForSize(selected, size) : null;
+  const fulfillmentMode = selected?.fulfillmentMode ?? product.fulfillmentMode;
+  const maximum = selected && fulfillmentMode === "STOCK" ? availableQuantityForSize(selected, size) : null;
   const safeQuantity = maximum !== null && maximum !== undefined ? Math.min(quantity, Math.max(1, maximum)) : quantity;
   const selectedSizeAvailability = selected && size ? sizeAvailabilityFor(selected, size) : undefined;
-  const inventoryUnconfirmed = selected?.fulfillmentMode === "STOCK" && (selectedSizeAvailability?.availabilityStatus === "NOT_CONFIGURED" || (!selectedSizeAvailability && selected.availabilityStatus === "NOT_CONFIGURED"));
+  const inventoryUnconfirmed = fulfillmentMode === "STOCK" && (selectedSizeAvailability?.availabilityStatus === "NOT_CONFIGURED" || (!selectedSizeAvailability && selected?.availabilityStatus === "NOT_CONFIGURED"));
   const selectColor = (value: string) => {
     onColorChange(value);
     if (size && !variants.some((variant) => variant.color === value && variantSizes(variant).includes(size))) onSizeChange("");
@@ -59,6 +60,7 @@ export function ProductPurchase({ product, color, size, onColorChange, onSizeCha
     <div className="product-purchase-actions"><button className="product-main-add" type="button" disabled={!purchasable} onClick={() => { addItem(product, safeQuantity, selected, size); setAdded(true); }}>
       {added ? <Check size={18} /> : <ShoppingBag size={18} />}{added ? "Agregado al pedido" : missing ? "Elige color y talla" : !priceKnown ? "Consultar precio" : inventoryUnconfirmed ? "Disponibilidad por confirmar" : !purchasable ? "No disponible" : "Agregar al pedido"}
     </button></div>
+    {selected && size && fulfillmentMode === "STOCK" && maximum !== null && maximum !== undefined && <p className="product-purchase-note" aria-live="polite">{selected.color} · {size}: {maximum} {maximum === 1 ? "unidad disponible" : "unidades disponibles"}.</p>}
     <p className="product-purchase-note" aria-live="polite">{missing ? "Selecciona las opciones de tu modelo para continuar." : !priceKnown ? "Consulta con FLOES el precio de esta selección." : inventoryUnconfirmed ? "Inventario pendiente de confirmar. Consulta por WhatsApp antes de comprar." : !purchasable ? "Esta selección no está disponible para pedido." : selected ? [selected.color, size || selected.size, selected.fulfillmentMode === "MADE_TO_ORDER" ? "Confección bajo pedido" : "Disponible"].filter(Boolean).join(" · ") : "Disponible para pedido."}</p>
     <WhatsAppCTA productName={product.name} color={color} size={size} className="product-whatsapp" />
   </div>;

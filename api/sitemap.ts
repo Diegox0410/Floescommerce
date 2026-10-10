@@ -1,6 +1,6 @@
 import type { ApiRequest, ApiResponse } from "./_lib/http.js";
 import { header } from "./_lib/http.js";
-import { chopifyBaseUrl } from "./_lib/chopify.js";
+import { chopifyProtectionHeaders, publicCatalogUrl } from "./_lib/chopify.js";
 
 const xml = (value: string) => value.replace(/[<>&"']/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[character]!);
 export default async function handler(request: ApiRequest, response: ApiResponse) {
@@ -10,7 +10,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
   if (!configured && !/^[a-z0-9.-]+(?::\d+)?$/i.test(host)) { response.statusCode = 400; response.end(); return; }
   const origin = configured ? new URL(configured).origin : `https://${host}`;
   try {
-    const upstream = await fetch(`${chopifyBaseUrl()}/api/catalog`, { signal: AbortSignal.timeout(10_000) });
+    const upstream = await fetch(publicCatalogUrl(), { headers: chopifyProtectionHeaders(), signal: AbortSignal.timeout(10_000) });
     if (!upstream.ok) throw new Error("Catalog unavailable");
     const catalog: unknown = await upstream.json();
     if (!Array.isArray(catalog)) throw new Error("Invalid catalog");

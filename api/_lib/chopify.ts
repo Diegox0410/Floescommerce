@@ -11,6 +11,14 @@ const requireEnvironment = (name: string) => {
 export const chopifyBaseUrl = () =>
   requireEnvironment("CHOPIFY_BASE_URL").replace(/\/$/, "");
 
+export const chopifyProtectionHeaders = (): Record<string, string> => {
+  const secret = process.env.CHOPIFY_VERCEL_PROTECTION_BYPASS_SECRET?.trim();
+  return secret ? { "x-vercel-protection-bypass": secret } : {};
+};
+
+export const publicCatalogUrl = () =>
+  `${chopifyBaseUrl()}/api/catalog?tenant=${encodeURIComponent(TENANT_ID)}`;
+
 export async function executeCommerce(
   operation: string,
   input: Record<string, unknown>,
@@ -22,8 +30,6 @@ export async function executeCommerce(
       ? "CHOPIFY_OWNER_API_TOKEN_FLOES"
       : "CHOPIFY_COMMERCE_API_TOKEN",
   );
-  const protectionBypassSecret =
-    process.env.CHOPIFY_VERCEL_PROTECTION_BYPASS_SECRET?.trim();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12_000);
 
@@ -34,9 +40,7 @@ export async function executeCommerce(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "X-Chopify-Tenant-Id": TENANT_ID,
-        ...(protectionBypassSecret
-          ? { "x-vercel-protection-bypass": protectionBypassSecret }
-          : {}),
+        ...chopifyProtectionHeaders(),
         ...(scope === "owner" ? { "X-Chopify-Access-Scope": "owner" } : {}),
       },
       body: JSON.stringify({

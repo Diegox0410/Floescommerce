@@ -1,6 +1,6 @@
 import type { ApiRequest, ApiResponse } from "./_lib/http.js";
 import { json } from "./_lib/http.js";
-import { chopifyBaseUrl } from "./_lib/chopify.js";
+import { chopifyBaseUrl, chopifyProtectionHeaders, publicCatalogUrl } from "./_lib/chopify.js";
 
 const absoluteAssetUrls = (value: unknown, origin: string): unknown => {
   if (Array.isArray(value)) return value.map((entry) => absoluteAssetUrls(entry, origin));
@@ -21,13 +21,16 @@ export default async function handler(request: ApiRequest, response: ApiResponse
 
   try {
     const origin = chopifyBaseUrl();
-    const upstream = await fetch(`${origin}/api/catalog`, {
-      headers: { Accept: "application/json" },
+    const upstream = await fetch(publicCatalogUrl(), {
+      headers: {
+        Accept: "application/json",
+        ...chopifyProtectionHeaders(),
+      },
       signal: AbortSignal.timeout(10_000),
     });
     if (!upstream.ok) throw new Error(`Catalog upstream failed (${upstream.status})`);
     const catalog: unknown = await upstream.json();
-    response.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+    response.setHeader("Cache-Control", "no-store");
     response.statusCode = 200;
     response.setHeader("Content-Type", "application/json; charset=utf-8");
     response.end(JSON.stringify(absoluteAssetUrls(catalog, origin)));

@@ -21,6 +21,7 @@ function collect(directory) {
 }
 collect("src");
 collect("tests");
+collect("api");
 for (const file of files) {
   const result = ts
     .transpileModule(fs.readFileSync(file, "utf8"), {
@@ -37,7 +38,7 @@ for (const file of files) {
     .replace(
       /(from\s*["']|import\s*["'])(\.[^"']+)(["'])/g,
       (_, start, specifier, end) =>
-        `${start}${specifier.replace(/\.ts$/, "")}.mjs${end}`,
+        `${start}${specifier.replace(/\.(ts|js)$/, "")}.mjs${end}`,
     );
   const destination = path.join(output, file.replace(/\.ts$/, ".mjs"));
   fs.mkdirSync(path.dirname(destination), { recursive: true });

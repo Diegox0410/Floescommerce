@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import { useStoreConfigStore } from "../../store/storeConfigStore";
-import { whatsappUrl } from "../../utils/storefront";
+import { productWhatsAppMessage, whatsappUrl } from "../../utils/storefront";
 
 interface WhatsAppCTAProps {
   productName?: string;
@@ -34,7 +34,7 @@ export function WhatsAppCTA({
   const resolvedMessage =
     message ||
     (productName
-      ? `Hola, estoy interesada en ${productName}${color ? ` color ${color}` : ""}${size ? ` talla ${size}` : ""}.`
+      ? productWhatsAppMessage(productName, color, size)
       : config.contact
           .whatsappMessage);
 

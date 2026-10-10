@@ -8,6 +8,8 @@ import { useProductStore } from "../../store/productStore";
 import { fetchChopifyCatalog } from "../../services/chopify/catalog";
 import { canPurchase } from "../../services/chopify/catalog";
 import { useCartStore } from "../../store/cartStore";
+import { useStoreConfigStore } from "../../store/storeConfigStore";
+import { applyPublicStoreConfig, fetchPublicStoreConfig } from "../../services/chopify/storeConfig";
 
 interface ProductCatalogBootstrapProps {
   children: ReactNode;
@@ -26,10 +28,15 @@ export function ProductCatalogBootstrap({
       store.beginRemoteLoad("catalog");
 
       try {
-        const products =
-          await fetchChopifyCatalog();
+        const [products, publicConfig] = await Promise.all([
+          fetchChopifyCatalog(),
+          fetchPublicStoreConfig(),
+        ]);
 
         if (!active) return;
+
+        const configStore = useStoreConfigStore.getState();
+        configStore.setConfig(applyPublicStoreConfig(configStore.config, publicConfig));
 
         useProductStore
           .getState()

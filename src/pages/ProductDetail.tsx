@@ -53,7 +53,7 @@ export function ProductDetail() {
       </section>
       <section className="size-guide-section" id="guia-tallas" aria-labelledby="size-guide-title">
         <div><span className="eyebrow">ELIGE CON CONFIANZA</span><h2 id="size-guide-title">{product.sizeGuide?.title || "Encuentra tu talla"}</h2>
-          <p>Mide una prenda que te quede bien, extendida sobre una superficie plana. Compara su ancho horizontal con la guía FLOES. Estas medidas corresponden a la prenda, no al contorno del cuerpo.</p>
+          <p>Mide una prenda que te quede bien, extendida sobre una superficie plana. Mide de lado a lado y compara ese ancho con la guía FLOES. Estas medidas corresponden a la prenda, no al contorno del cuerpo. No multipliques automáticamente por 2.</p>
           {product.sizeGuide?.note && <p>{product.sizeGuide.note}</p>}{product.sizeRecommendation && <p>{product.sizeRecommendation}</p>}
           <p>Si estás entre dos tallas, consulta según tu preferencia de ajuste. La guía orienta la elección; el ajuste puede variar.</p>
         </div>
