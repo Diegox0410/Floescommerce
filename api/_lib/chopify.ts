@@ -22,6 +22,8 @@ export async function executeCommerce(
       ? "CHOPIFY_OWNER_API_TOKEN_FLOES"
       : "CHOPIFY_COMMERCE_API_TOKEN",
   );
+  const protectionBypassSecret =
+    process.env.CHOPIFY_VERCEL_PROTECTION_BYPASS_SECRET?.trim();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12_000);
 
@@ -32,6 +34,9 @@ export async function executeCommerce(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "X-Chopify-Tenant-Id": TENANT_ID,
+        ...(protectionBypassSecret
+          ? { "x-vercel-protection-bypass": protectionBypassSecret }
+          : {}),
         ...(scope === "owner" ? { "X-Chopify-Access-Scope": "owner" } : {}),
       },
       body: JSON.stringify({
