@@ -41,6 +41,7 @@ import {
 import {
   StockMovementDialog,
 } from "../components/StockMovementDialog";
+import { ChopifyInventoryPanel } from "../components/ChopifyInventoryPanel";
 
 import {
   money,
@@ -177,6 +178,8 @@ export function AdminInventory() {
         title="Inventario"
         description="Controla entradas, salidas, stock mínimo y valorización."
       />
+
+      <ChopifyInventoryPanel />
 
       <ErrorMessage
         message={

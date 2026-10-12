@@ -1,0 +1,71 @@
+{
+  "format": "webp",
+  "quality": 84,
+  "sourceDirectory": "Imagenes/",
+  "notes": "Las fuentes JPEG se conservan sin modificaciones. Ninguna imagen de esta campaña está asignada a un SKU o variante.",
+  "images": [
+    {
+      "source": "Imagenes/Web (1).jpeg",
+      "path": "/images/editorial/campana-modelo-negro-retrato.webp",
+      "width": 1536,
+      "height": 1024,
+      "sourceBytes": 170761,
+      "webBytes": 135110,
+      "purpose": "Historia visual de marca; retrato editorial en scrub negro"
+    },
+    {
+      "source": "Imagenes/Web (2).jpeg",
+      "path": "/images/editorial/campana-scrub-azul-marino.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceBytes": 147400,
+      "webBytes": 94360,
+      "purpose": "Galería editorial de campaña; no asociada a variante"
+    },
+    {
+      "source": "Imagenes/Web (3).jpeg",
+      "path": "/images/editorial/campana-scrub-arena.webp",
+      "width": 1448,
+      "height": 1086,
+      "sourceBytes": 194697,
+      "webBytes": 139532,
+      "purpose": "Galería editorial de campaña; encuadre horizontal"
+    },
+    {
+      "source": "Imagenes/Web (4).jpeg",
+      "path": "/images/editorial/campana-detalles-editorial.webp",
+      "width": 1600,
+      "height": 900,
+      "sourceBytes": 194053,
+      "webBytes": 135176,
+      "purpose": "Banner narrativo con collage de campaña; no usar como tarjeta de producto"
+    },
+    {
+      "source": "Imagenes/Web (5).jpeg",
+      "path": "/images/editorial/campana-hero-scrub-negro.webp",
+      "width": 1600,
+      "height": 900,
+      "sourceBytes": 140524,
+      "webBytes": 95242,
+      "purpose": "Hero panorámico; modelo a la derecha y espacio negativo a la izquierda"
+    },
+    {
+      "source": "Imagenes/Web (6).jpeg",
+      "path": "/images/editorial/campana-scrub-vino.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceBytes": 145630,
+      "webBytes": 95248,
+      "purpose": "Galería editorial de campaña; uniforme vino, no asociado a variante"
+    },
+    {
+      "source": "Imagenes/Web (7).jpeg",
+      "path": "/images/editorial/campana-scrub-azul-profundo.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceBytes": 87981,
+      "webBytes": 51384,
+      "purpose": "Galería editorial de campaña; no asociada a variante"
+    }
+  ]
+}

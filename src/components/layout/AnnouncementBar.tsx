@@ -10,9 +10,8 @@ export function AnnouncementBar() {
     <div className="announcement-bar">
       <div className="container">
         <span>
-  {a.text}
-  <span className="usa-flag usa-flag-small" aria-label="Estados Unidos" />
-</span>
+          {a.text}
+        </span>
         {a.href && a.linkText && (
           <Link to={a.href}>{a.linkText}</Link>
         )}

@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useStoreConfigStore } from "../../store/storeConfigStore";
 import type { Product, ProductVariant } from "../../types/product";
 import { catalogPrice, hasKnownPrice } from "../../services/chopify/catalog";
+import { editorialImagesForProduct } from "../../data/editorialProductImages";
 
 export function StoreSEO({ product, variant }: { product?: Product; variant?: ProductVariant }) {
   const config = useStoreConfigStore((state) => state.config);
@@ -14,7 +15,8 @@ export function StoreSEO({ product, variant }: { product?: Product; variant?: Pr
     let origin = window.location.origin;
     try { if (configured && new URL(configured).protocol === "https:") origin = new URL(configured).origin; } catch { /* Use the current store origin. */ }
     const url = new URL(product ? `/producto/${product.slug || product.id}` : pathname, origin).href;
-    const image = variant?.images?.[0] || product?.image || config.home.hero.image;
+    const productEditorialImages = product ? editorialImagesForProduct(product.slug, variant?.color) : [];
+    const image = product ? productEditorialImages[0] : config.home.hero.image;
     document.title = title;
     const meta = (key: string, value: string, property = false) => {
       const attribute = property ? "property" : "name";
@@ -34,7 +36,7 @@ export function StoreSEO({ product, variant }: { product?: Product; variant?: Pr
       script.textContent = JSON.stringify({
         "@context": "https://schema.org", "@type": "Product", name: product.name, description,
         sku: variant?.sku || product.sku, brand: { "@type": "Brand", name: "FLOES" },
-        image: (variant?.images?.length ? variant.images : product.images).map((entry) => new URL(entry, origin).href),
+        ...(productEditorialImages.length ? { image: productEditorialImages.map((entry) => new URL(entry, origin).href) } : {}),
         ...(hasKnownPrice(product, variant) ? { offers: { "@type": "Offer", url, price: catalogPrice(product, variant), priceCurrency: product.currency || "USD", availability: (variant ? variant.available : product.inStock) === true ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } } : {}),
       });
       document.head.append(script);

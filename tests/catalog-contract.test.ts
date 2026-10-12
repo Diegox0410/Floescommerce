@@ -43,6 +43,10 @@ test("catalog mapping rejects a malformed upstream payload", () => {
   assert.throws(() => mapChopifyCatalog({ products: [] }), /catálogo inválido/);
 });
 
+test("an empty upstream catalog is a valid empty result, not an integration error", () => {
+  assert.deepEqual(mapChopifyCatalog([]), []);
+});
+
 test("one parent keeps color SKUs, real image, declared sizes and flat garment guide", () => {
   const [product] = mapChopifyCatalog([{
     ...base, price: { amount: 45, currency: "USD" }, pricingStatus: "READY", characteristics: ["Bolsillo lateral"], material: "Tela registrada",

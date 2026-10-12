@@ -29,6 +29,9 @@ export function SearchOverlay({
   onClose,
 }: SearchOverlayProps) {
   const collection = useProductStore(state => state.products);
+  const catalogReady = useProductStore((state) => state.remoteReady);
+  const catalogLoading = useProductStore((state) => state.remoteLoading);
+  const catalogError = useProductStore((state) => state.remoteError);
   const shortName = useStoreConfigStore((s) => s.config.identity.shortName);
   const [query, setQuery] =
     useState("");
@@ -96,6 +99,7 @@ export function SearchOverlay({
 
   const results =
     useMemo(() => {
+      if (!catalogReady) return [];
       const products = collection.filter(p => p.active);
       const normalizedQuery =
         query
@@ -125,7 +129,7 @@ export function SearchOverlay({
           );
         })
         .slice(0, 6);
-    }, [query, collection]);
+    }, [catalogReady, query, collection]);
 
   if (!open) {
     return null;
@@ -197,7 +201,12 @@ export function SearchOverlay({
             </strong>
           </div>
 
-          {results.length >
+          {!catalogReady ? (
+            <div className="search-empty" role={catalogError ? "alert" : "status"}>
+              <h3>{catalogError ? "El catálogo no está disponible." : catalogLoading ? "Cargando catálogo…" : "Conectando con el catálogo…"}</h3>
+              <p>{catalogError || "La búsqueda mostrará modelos cuando termine la consulta a Chopify."}</p>
+            </div>
+          ) : results.length >
           0 ? (
             <div className="search-results">
               {results.map(

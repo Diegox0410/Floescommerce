@@ -7,6 +7,7 @@ import { AdminSectionHeader } from "../components/AdminSectionHeader";
 import { OperationStats, Field, DataTable, EmptyState } from "../components/OperationsUI";
 import { dateTime } from "../components/operationFormat";
 import { money } from "../components/format";
+import { ChopifyCustomersPanel } from "../components/ChopifyCustomersPanel";
 export function AdminCustomers() {
   const customers = useCustomerStore((s) => s.customers),
     orders = useOrderStore((s) => s.orders);
@@ -28,6 +29,7 @@ export function AdminCustomers() {
         title="Clientes"
         description="Conoce quién compra, cuánto compra y cuándo volver a contactarlo."
       />
+      <ChopifyCustomersPanel />
       <OperationStats
         items={[
           { label: "Clientes totales", value: String(customers.length) },

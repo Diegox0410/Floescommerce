@@ -46,6 +46,7 @@ export function ProductGallery({
       <div className="product-gallery-main">
         {selectedImage ? (
           <img
+            key={selectedImage}
             src={selectedImage}
             alt={name}
             className="product-gallery-image"
@@ -56,9 +57,8 @@ export function ProductGallery({
           />
         ) : (
           <div className="product-detail-placeholder">
-            <div className="product-detail-bottle">
-              <span>{initials}</span>
-            </div>
+            <span className="product-detail-placeholder-monogram" aria-hidden="true">{initials}</span>
+            <small>Fotografía editorial pendiente</small>
           </div>
         )}
       </div>

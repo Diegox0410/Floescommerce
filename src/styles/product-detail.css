@@ -435,3 +435,5 @@
 .size-guide-section th:first-child { text-align: left; }
 @media (max-width: 650px) { .size-guide-section { grid-template-columns: 1fr; gap: 24px; margin-top: 65px; } }
 @media (max-width: 650px) { .product-editorial-header { padding: 30px 0 48px; } .product-gallery-editorial { grid-template-columns: 1fr; } .product-gallery-editorial figure,.product-gallery-editorial figure:first-child:nth-last-child(odd) { grid-column: auto; min-height: 460px; } }
+.product-gallery-wrap { min-width: 0; }
+.product-photo-reference-note { margin: 12px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }

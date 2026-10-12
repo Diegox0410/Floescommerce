@@ -13,7 +13,7 @@ export function CategoryFilter({
   const products = useProductStore((s) => s.products);
   const categories = [...new Set(products.filter((p) => p.active).map((p) => p.category))].map((name) => ({ id: slugify(name), slug: slugify(name), name }));
   return (
-    <aside className="catalog-sidebar">
+    <aside className="catalog-sidebar" aria-label="Filtrar por categoría">
 
       <span className="catalog-filter-title">
         Categorías
@@ -26,6 +26,7 @@ export function CategoryFilter({
             : "catalog-filter"
         }
         onClick={() => onSelectCategory("all")}
+        aria-pressed={selectedCategory === "all"}
       >
         Todos
       </button>
@@ -41,6 +42,7 @@ export function CategoryFilter({
           onClick={() =>
             onSelectCategory(category.slug)
           }
+        aria-pressed={selectedCategory === category.slug}
         >
           {category.name}
         </button>

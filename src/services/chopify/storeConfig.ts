@@ -17,7 +17,22 @@ export function applyPublicStoreConfig(config: StoreConfig, value: unknown): Sto
 }
 
 export async function fetchPublicStoreConfig(): Promise<unknown> {
-  const response = await fetch("/api/store-config", { headers: { Accept: "application/json" }, cache: "no-store" });
-  if (!response.ok) throw new Error("No se pudo cargar el contacto de FLOES.");
+  const response = await fetch("/api/store-config", {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(12_000),
+  }).catch((error: unknown) => {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      throw new Error("Chopify no respondió a /api/store-config en 12 segundos.");
+    }
+    throw error;
+  });
+  if (!response.ok) {
+    const payload = record(await response.json().catch(() => ({})));
+    const upstreamError = text(payload.error);
+    throw new Error(upstreamError
+      ? `Configuración de contacto FLOES: HTTP ${response.status} — ${upstreamError}`
+      : `Configuración de contacto FLOES: HTTP ${response.status}.`);
+  }
   return response.json();
 }

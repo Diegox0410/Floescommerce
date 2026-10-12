@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+  <rect width="1080" height="1350" fill="#fbf8f4"/>
+  <circle cx="930" cy="125" r="210" fill="#f1e7e8"/>
+  <path d="M0 1120c240-108 508-91 1080 22v208H0Z" fill="#eee4e5"/>
+  <text x="82" y="116" fill="#795c67" font-family="Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="5">FLOES · GUÍA DE TALLAS</text>
+  <text x="78" y="204" fill="#29232a" font-family="Georgia,serif" font-size="76">Encuentra tu talla</text>
+  <text x="82" y="259" fill="#685e64" font-family="Arial,sans-serif" font-size="28">Una guía sencilla para elegir con confianza.</text>
+  <rect x="72" y="315" width="450" height="585" rx="30" fill="#fffefa" stroke="#e2d6d5" stroke-width="2"/>
+  <rect x="558" y="315" width="450" height="585" rx="30" fill="#fffefa" stroke="#e2d6d5" stroke-width="2"/>
+  <text x="112" y="382" fill="#795c67" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">1 · BLUSA</text>
+  <g transform="translate(128 405) scale(.61)" fill="none" stroke="#795c67" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M130 28 82 47 34 103l47 31 25-27v208h236V107l25 27 47-31-48-56-48-19-57 37h-64z"/>
+    <path d="M102 149h238M104 242h234" stroke-dasharray="10 13"/>
+    <path d="m100 137-12 12 12 12m242-24 12 12-12 12M207 231l13 12 13-12m-13-105v112"/>
+  </g>
+  <text x="112" y="690" fill="#29232a" font-family="Georgia,serif" font-size="31">Pecho · cintura · largo</text>
+  <text x="112" y="744" fill="#685e64" font-family="Arial,sans-serif" font-size="23">Extiende la blusa y mide</text>
+  <text x="112" y="780" fill="#685e64" font-family="Arial,sans-serif" font-size="23">horizontalmente, de lado a lado.</text>
+  <text x="598" y="382" fill="#795c67" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">2 · PANTALÓN</text>
+  <g transform="translate(650 405) scale(.82)" fill="none" stroke="#795c67" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 0h160l-11 85-13 190h-57l3-166-4-1-4 167H40L27 85z"/>
+    <path d="M27 40h150M35 75h135" stroke-dasharray="10 13"/>
+    <path d="m22 31 7 9 7-9m134 0 7 9 7-9m-92 62 8 8 8-8m-8-4v117"/>
+  </g>
+  <text x="598" y="690" fill="#29232a" font-family="Georgia,serif" font-size="31">Cintura · cadera · largo</text>
+  <text x="598" y="744" fill="#685e64" font-family="Arial,sans-serif" font-size="23">Extiende el pantalón y mide</text>
+  <text x="598" y="780" fill="#685e64" font-family="Arial,sans-serif" font-size="23">cada ancho de lado a lado.</text>
+  <text x="82" y="955" fill="#795c67" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="3">TALLAS DISPONIBLES</text>
+  <g font-family="Arial,sans-serif" font-size="26" font-weight="700" text-anchor="middle">
+    <rect x="112" y="985" width="142" height="70" rx="35" fill="#f2e9e8"/><text x="183" y="1030" fill="#503d47">XS</text>
+    <rect x="278" y="985" width="142" height="70" rx="35" fill="#f2e9e8"/><text x="349" y="1030" fill="#503d47">S</text>
+    <rect x="444" y="985" width="142" height="70" rx="35" fill="#795c67"/><text x="515" y="1030" fill="#fff">M</text>
+    <rect x="610" y="985" width="142" height="70" rx="35" fill="#f2e9e8"/><text x="681" y="1030" fill="#503d47">L</text>
+    <rect x="776" y="985" width="142" height="70" rx="35" fill="#f2e9e8"/><text x="847" y="1030" fill="#503d47">XL</text>
+  </g>
+  <text x="82" y="1167" fill="#29232a" font-family="Georgia,serif" font-size="37">Mide en plano, no sobre el cuerpo.</text>
+  <text x="84" y="1225" fill="#685e64" font-family="Arial,sans-serif" font-size="25">Extiende una prenda que te quede bien y mide</text>
+  <text x="84" y="1263" fill="#685e64" font-family="Arial,sans-serif" font-size="25">de lado a lado. No multipliques por dos.</text>
+  <text x="84" y="1310" fill="#795c67" font-family="Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="2">FLOES.EC · LA GUÍA EXACTA ESTÁ EN CADA MODELO</text>
+</svg>

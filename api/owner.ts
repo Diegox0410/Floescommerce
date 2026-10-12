@@ -7,6 +7,8 @@ const allowed = new Set([
   "listOrders",
   "getOrderDetail",
   "listPaymentReviews",
+  "listCustomers",
+  "searchProducts",
   "approvePayment",
   "rejectPaymentProof",
   "startPreparation",
@@ -27,7 +29,11 @@ const clean = (value: unknown, max = 160) =>
 
 const safeInput = (operation: string, raw: unknown) => {
   const input = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
-  if (["ownerDashboard", "listOrders", "listPaymentReviews"].includes(operation)) return {};
+  if (["ownerDashboard", "listOrders", "listPaymentReviews", "listCustomers"].includes(operation)) return {};
+  if (operation === "searchProducts") {
+    const limit = Number(input.limit);
+    return { query: clean(input.query, 120), limit: Number.isFinite(limit) ? Math.max(1, Math.min(200, Math.floor(limit))) : 200 };
+  }
   if (["getOrderDetail", "startPreparation", "markReady", "markDelivered"].includes(operation)) {
     return { orderId: clean(input.orderId) };
   }
@@ -40,10 +46,16 @@ const safeInput = (operation: string, raw: unknown) => {
   return { paymentId: clean(input.paymentId), proofId: clean(input.proofId), reason: clean(input.reason, 300) };
 };
 
-export default async function handler(request: ApiRequest, response: ApiResponse) {
+export interface OwnerHandlerDependencies {
+  authorize?: (request: ApiRequest) => Promise<unknown>;
+}
+
+export function createOwnerHandler(dependencies: OwnerHandlerDependencies = {}) {
+  const authorize = dependencies.authorize ?? requireFloesOwner;
+  return async function handler(request: ApiRequest, response: ApiResponse) {
   if (request.method !== "POST") return json(response, 405, { error: "Method not allowed" });
   try {
-    await requireFloesOwner(request);
+    await authorize(request);
   } catch (error) {
     console.error("FLOES owner auth:", error instanceof Error ? error.message : "unknown");
     return json(response, 401, { error: "Unauthorized" });
@@ -64,7 +76,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
 
   try {
     const data = await executeCommerce(operation, safeInput(operation, body.input), {
-      scope: "owner",
+      scope: operation === "searchProducts" ? "commerce" : "owner",
       ...(idempotencyKey ? { idempotencyKey } : {}),
     });
     return json(response, 200, { ok: true, tenantId, data });
@@ -72,4 +84,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     console.error("FLOES owner operation:", error instanceof Error ? error.message : "unknown");
     return json(response, 409, { error: "La operación no pudo completarse en el estado actual." });
   }
+  };
 }
+
+export default createOwnerHandler();

@@ -19,6 +19,7 @@ import {
   getCartQuantity,
   getCartSubtotal,
 } from "../../store/cartSelectors";
+import { editorialImagesForProduct } from "../../data/editorialProductImages";
 
 export function CartDrawer() {
   const items = useCartItems();
@@ -170,6 +171,7 @@ export function CartDrawer() {
                         2
                       )
                       .join("");
+                  const editorialImage = editorialImagesForProduct(product.slug, variant?.color)[0];
 
                   return (
                     <article
@@ -186,7 +188,7 @@ export function CartDrawer() {
                           closeCart
                         }
                       >
-                        {product.image ? <img src={product.image} alt="" loading="lazy" /> : <div>
+                        {editorialImage ? <img src={editorialImage} alt="" loading="lazy" /> : <div>
                           {initials}
                         </div>}
                       </Link>

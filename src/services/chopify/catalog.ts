@@ -197,7 +197,21 @@ export const resolveVariant = (product: Product, color: string, size: string) =>
 );
 
 export async function fetchChopifyCatalog(): Promise<Product[]> {
-  const response = await fetch("/api/catalog", { headers: { Accept: "application/json" } });
-  if (!response.ok) throw new Error("No se pudo cargar el catálogo de FLOES.");
+  const response = await fetch("/api/catalog", {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(12_000),
+  }).catch((error: unknown) => {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      throw new Error("Chopify no respondió a /api/catalog en 12 segundos.");
+    }
+    throw error;
+  });
+  if (!response.ok) {
+    const payload = record(await response.json().catch(() => ({})));
+    const upstreamError = text(payload.error);
+    throw new Error(upstreamError
+      ? `Catálogo FLOES: HTTP ${response.status} — ${upstreamError}`
+      : `Catálogo FLOES: HTTP ${response.status}.`);
+  }
   return mapChopifyCatalog(await response.json());
 }

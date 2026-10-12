@@ -1,17 +1,4 @@
-import { AdminProductEditor } from './admin/pages/AdminProductEditor';
-import { AdminCustomerDetail } from './admin/pages/AdminCustomerDetail';
-import { AdminLayout } from './admin/layout/AdminLayout';
-import { AdminDashboard } from './admin/pages/AdminDashboard';
-import { AdminProducts } from './admin/pages/AdminProducts';
-import { AdminInventory } from './admin/pages/AdminInventory';
-import { AdminOrders } from './admin/pages/AdminOrders';
-import { AdminCustomers } from './admin/pages/AdminCustomers';
-import { AdminFinance } from './admin/pages/AdminFinance';
-import { AdminProjection } from './admin/pages/AdminProjection';
-import { AdminAnalytics } from './admin/pages/AdminAnalytics';
-import { AdminMarketing } from './admin/pages/AdminMarketing';
-import { AdminSettings } from './admin/pages/AdminSettings';
-import { AdminStore } from './admin/pages/AdminStore';
+import { lazy, Suspense } from 'react';
 import {
   BrowserRouter,
   Route,
@@ -50,10 +37,36 @@ import {
   NotFound,
 } from "./pages/NotFound";
 
+const AdminLayout = lazy(() => import('./admin/layout/AdminLayout').then((module) => ({ default: module.AdminLayout })));
+const AdminDashboard = lazy(() => import('./admin/pages/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const AdminProductEditor = lazy(() => import('./admin/pages/AdminProductEditor').then((module) => ({ default: module.AdminProductEditor })));
+const AdminCustomerDetail = lazy(() => import('./admin/pages/AdminCustomerDetail').then((module) => ({ default: module.AdminCustomerDetail })));
+const AdminProducts = lazy(() => import('./admin/pages/AdminProducts').then((module) => ({ default: module.AdminProducts })));
+const AdminInventory = lazy(() => import('./admin/pages/AdminInventory').then((module) => ({ default: module.AdminInventory })));
+const AdminOrders = lazy(() => import('./admin/pages/AdminOrders').then((module) => ({ default: module.AdminOrders })));
+const AdminCustomers = lazy(() => import('./admin/pages/AdminCustomers').then((module) => ({ default: module.AdminCustomers })));
+const AdminFinance = lazy(() => import('./admin/pages/AdminFinance').then((module) => ({ default: module.AdminFinance })));
+const AdminProjection = lazy(() => import('./admin/pages/AdminProjection').then((module) => ({ default: module.AdminProjection })));
+const AdminAnalytics = lazy(() => import('./admin/pages/AdminAnalytics').then((module) => ({ default: module.AdminAnalytics })));
+const AdminMarketing = lazy(() => import('./admin/pages/AdminMarketing').then((module) => ({ default: module.AdminMarketing })));
+const AdminSettings = lazy(() => import('./admin/pages/AdminSettings').then((module) => ({ default: module.AdminSettings })));
+const AdminStore = lazy(() => import('./admin/pages/AdminStore').then((module) => ({ default: module.AdminStore })));
+const VisualReviewPage = import.meta.env.DEV
+  ? lazy(() => import('./pages/VisualReviewPage').then((module) => ({ default: module.VisualReviewPage })))
+  : null;
+
+function AdminLoading() {
+  return <div className="admin-card admin-module" role="status" aria-live="polite">Cargando administración…</div>;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {import.meta.env.DEV && VisualReviewPage && (
+          <Route path="/__visual-review" element={<Suspense fallback={<div role="status">Cargando revisión visual…</div>}><VisualReviewPage /></Suspense>} />
+        )}
 
         <Route
           element={
@@ -111,7 +124,7 @@ function App() {
 
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<Suspense fallback={<AdminLoading />}><AdminLayout /></Suspense>}>
           <Route index element={<AdminDashboard />} />
           <Route path="productos/nuevo" element={<AdminProductEditor />} />
           <Route path="productos/:id" element={<AdminProductEditor />} />

@@ -10,6 +10,7 @@ import type { Product } from "../../types/product";
 import { useCartStore } from "../../store/cartStore";
 
 import { canPurchase, hasKnownPrice, catalogPrice } from "../../services/chopify/catalog";
+import { editorialImagesForProduct } from "../../data/editorialProductImages";
 
 interface ProductCardProps {
   product: Product;
@@ -25,6 +26,9 @@ export function ProductCard({
   const price = catalogPrice(product);
   const href = `/producto/${product.slug || product.id}`;
   const colorCount = new Set(product.variants.filter((variant) => variant.active).map((variant) => variant.color).filter(Boolean)).size;
+  const editorialImages = editorialImagesForProduct(product.slug);
+  const primaryImage = editorialImages[0];
+  const alternateImage = editorialImages.find((image) => image !== primaryImage);
 
   const handleAddToCart = () => {
     addItem(product, 1);
@@ -32,21 +36,34 @@ export function ProductCard({
   const knownPrice = hasKnownPrice(product);
 
   return (
-    <article className="product-card">
+    <article className="product-card" data-scroll-item="product">
       <Link
         to={href}
         className="product-media"
         aria-label={`Ver ${product.name}`}
       >
-        {product.image ? (
-          <img
-            src={product.image}
-            alt={product.name}
+        {primaryImage ? (
+          <>
+            <img
+              src={primaryImage}
+              alt={product.name}
+              className="product-card-image-primary"
+              loading="lazy"
+              decoding="async"
+              width={600}
+              height={750}
+            />
+          {alternateImage && <img
+            src={alternateImage}
+            alt=""
+            aria-hidden="true"
+            className="product-card-image-secondary"
             loading="lazy"
             decoding="async"
             width={600}
             height={750}
-          />
+          />}
+          </>
         ) : (
           <div className="product-image-placeholder">
             <span>
@@ -58,6 +75,7 @@ export function ProductCard({
                 .slice(0, 2)
                 .join("")}
             </span>
+            <small>Fotografía editorial pendiente</small>
           </div>
         )}
 

@@ -17,6 +17,7 @@ import { availableQuantityForSize, catalogPrice } from "../services/chopify/cata
 import { useCartStore } from "../store/cartStore";
 import { useStoreConfigStore } from "../store/storeConfigStore";
 import { WhatsAppCTA } from "../components/common/WhatsAppCTA";
+import { editorialImagesForProduct } from "../data/editorialProductImages";
 
 import {
   getCartQuantity,
@@ -141,6 +142,7 @@ export function Cart() {
                     )
                     .slice(0, 2)
                     .join("");
+                const editorialImage = editorialImagesForProduct(product.slug, variant?.color)[0];
 
                 return (
                   <article
@@ -151,9 +153,9 @@ export function Cart() {
                       to={`/producto/${product.id}`}
                       className="cart-page-item-media"
                     >
-                      {product.image ? (
+                      {editorialImage ? (
                         <img
-                          src={product.image}
+                          src={editorialImage}
                           alt={product.name}
                           loading="lazy"
                         />

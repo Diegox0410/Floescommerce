@@ -9,6 +9,7 @@ interface CatalogToolbarProps {
   sort: string;
   onSortChange: (value: string) => void;
   totalProducts: number;
+  resultsState?: "loading" | "error" | "ready";
 }
 
 export function CatalogToolbar({
@@ -17,12 +18,15 @@ export function CatalogToolbar({
   sort,
   onSortChange,
   totalProducts,
+  resultsState = "ready",
 }: CatalogToolbarProps) {
   return (
     <div className="catalog-toolbar">
 
-      <div className="catalog-result-count">
-        <span>{totalProducts}</span>
+      <div className="catalog-result-count" aria-live="polite" aria-atomic="true">
+        <span aria-label={resultsState === "ready" ? `${totalProducts} modelos` : "Conteo de modelos no disponible"}>
+          {resultsState === "loading" ? "…" : resultsState === "error" ? "—" : totalProducts}
+        </span>
         modelos
       </div>
 
@@ -47,6 +51,7 @@ export function CatalogToolbar({
 
           <select
             value={sort}
+            aria-label="Ordenar productos"
             onChange={(event) =>
               onSortChange(event.target.value)
             }

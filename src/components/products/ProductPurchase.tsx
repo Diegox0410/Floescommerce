@@ -6,9 +6,10 @@ import { WhatsAppCTA } from "../common/WhatsAppCTA";
 import { availableQuantityForSize, canPurchase, hasKnownPrice, resolveVariant, sizeAvailabilityFor, variantSizes } from "../../services/chopify/catalog";
 import { slugify } from "../../utils/normalization";
 
-export function ProductPurchase({ product, color, size, onColorChange, onSizeChange }: {
+export function ProductPurchase({ product, color, size, onColorChange, onSizeChange, onOpenSizeGuide }: {
   product: Product; color: string; size: string;
   onColorChange: (color: string) => void; onSizeChange: (size: string) => void;
+  onOpenSizeGuide: () => void;
 }) {
   const variants = product.variants.filter((variant) => variant.active);
   const colors = [...new Set(variants.map((variant) => variant.color).filter((value): value is string => Boolean(value)))];
@@ -46,13 +47,14 @@ export function ProductPurchase({ product, color, size, onColorChange, onSizeCha
         </button>;
       })}</div>
     </fieldset>}
-    {sizes.length > 0 && <fieldset className="variant-selector size-selector"><legend>Talla <a href="#guia-tallas">Guía de tallas</a></legend><div className="variant-options">{sizes.map((value) => {
+    {sizes.length > 0 && <fieldset className="variant-selector size-selector"><legend>Talla <button className="size-guide-inline-link" type="button" onClick={onOpenSizeGuide}>Guía de tallas</button></legend><div className="variant-options">{sizes.map((value) => {
       const matching = variants.filter((variant) => (!color || slugify(variant.color ?? "") === slugify(color)) && variantSizes(variant).includes(value));
       const available = matching.some((variant) => canPurchase(product, variant, value));
       const unconfirmed = matching.some((variant) => sizeAvailabilityFor(variant, value)?.availabilityStatus === "NOT_CONFIGURED" || (!variant.sizeAvailability?.length && variant.availabilityStatus === "NOT_CONFIGURED"));
       const statusLabel = available ? "" : unconfirmed ? ", inventario por confirmar" : ", no disponible";
       return <button type="button" key={value} className={`${size === value ? "active" : ""}${!available ? " unavailable" : ""}`} aria-pressed={size === value} aria-label={`${value}${statusLabel}`} onClick={() => { onSizeChange(value); setAdded(false); }}>{value}</button>;
     })}</div></fieldset>}
+    <button className="size-guide-cta" type="button" onClick={onOpenSizeGuide}><span aria-hidden="true">📏</span> Encuentra tu talla</button>
     <div className="product-quantity"><span>Cantidad</span><div className="product-quantity-control">
       <button type="button" onClick={() => setQuantity(Math.max(1, safeQuantity - 1))} aria-label="Disminuir cantidad" disabled={safeQuantity <= 1}><Minus size={16} /></button>
       <strong>{safeQuantity}</strong><button type="button" onClick={() => setQuantity(safeQuantity + 1)} disabled={maximum !== null && maximum !== undefined && safeQuantity >= maximum} aria-label="Aumentar cantidad"><Plus size={16} /></button>

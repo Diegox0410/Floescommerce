@@ -21,8 +21,11 @@ export function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
       <div className="container header-inner">
         <button
           className="header-mobile-toggle"
-          onClick={() => setMobile(!mobile)}
+          type="button"
+          onClick={() => setMobile((open) => !open)}
           aria-label={mobile ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={mobile}
+          aria-controls="floes-primary-navigation"
         >
           {mobile ? <X /> : <Menu />}
         </button>
@@ -39,7 +42,7 @@ export function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
           )}
         </Link>
 
-        <nav className={mobile ? "header-nav is-open" : "header-nav"}>
+        <nav id="floes-primary-navigation" className={mobile ? "header-nav is-open" : "header-nav"} aria-label="Navegación principal">
           {nav.map((item) => (
             <NavLink
               key={item.id}
@@ -52,11 +55,11 @@ export function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
         </nav>
 
         <div className="header-actions">
-          <button onClick={onOpenSearch} aria-label="Buscar">
+          <button type="button" onClick={onOpenSearch} aria-label="Buscar">
             <Search />
           </button>
 
-          <button onClick={openCart} aria-label="Carrito">
+          <button type="button" onClick={openCart} aria-label={quantity ? `Carrito, ${quantity} ${quantity === 1 ? "producto" : "productos"}` : "Carrito"}>
             <ShoppingBag />
             <span>{quantity}</span>
           </button>

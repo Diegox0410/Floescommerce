@@ -12,11 +12,14 @@ import { CatalogGrid } from "../components/catalog/CatalogGrid";
 
 import { useProductStore } from "../store/productStore";
 import { slugify } from "../utils/normalization";
-import { hasKnownPrice, catalogPrice } from "../services/chopify/catalog";
+import { hasKnownPrice, catalogPrice, variantSizes } from "../services/chopify/catalog";
 import { StoreSEO } from "../components/common/StoreSEO";
 
 export function Catalog() {
   const products = useProductStore(state => state.products);
+  const remoteLoading = useProductStore((state) => state.remoteLoading);
+  const remoteReady = useProductStore((state) => state.remoteReady);
+  const remoteError = useProductStore((state) => state.remoteError);
   const [searchParams] =
     useSearchParams();
 
@@ -41,15 +44,18 @@ export function Catalog() {
     useState("featured");
   const [availableOnly, setAvailableOnly] = useState(false);
   const [colorFilter, setColorFilter] = useState("");
-  const colors = [...new Set(products.filter((product) => product.active).flatMap((product) => product.colors.map((color) => color.name)))];
+  const [sizeFilter, setSizeFilter] = useState("");
+  const activeVariants = products.filter((product) => product.active).flatMap((product) => product.variants.filter((variant) => variant.active));
+  const colors = [...new Set(activeVariants.map((variant) => variant.color).filter((value): value is string => Boolean(value)))];
+  const sizes = [...new Set(activeVariants.flatMap(variantSizes))].sort((left, right) => left.localeCompare(right, "es", { numeric: true }));
 
+  const publishedProducts = products.filter((product) => product.active);
   const filteredProducts =
     useMemo(() => {
-      let result = [
-        ...products.filter(p => p.active),
-      ];
+      let result = [...publishedProducts];
       if (availableOnly) result = result.filter((product) => product.inStock === true);
       if (colorFilter) result = result.filter((product) => product.variants.some((variant) => variant.active && slugify(variant.color ?? "") === slugify(colorFilter)));
+      if (sizeFilter) result = result.filter((product) => product.variants.some((variant) => variant.active && (!colorFilter || slugify(variant.color ?? "") === slugify(colorFilter)) && variantSizes(variant).includes(sizeFilter)));
 
       /* =====================================================
          CATEGORY FILTER
@@ -215,13 +221,14 @@ export function Catalog() {
 
       return result;
     }, [
-      products,
+      publishedProducts,
       selectedCategory,
       filterParam,
       search,
       sort,
       availableOnly,
       colorFilter,
+      sizeFilter,
     ]);
 
   /* =======================================================
@@ -345,14 +352,7 @@ export function Catalog() {
   return (
     <main>
       <StoreSEO />
-      <PageHeader
-        eyebrow={eyebrow}
-        title={title}
-        accent={accent}
-        description={
-          description
-        }
-      />
+      <PageHeader eyebrow={eyebrow} title={title} accent={accent} description={description} />
 
       <section className="catalog-section">
         <div className="container">
@@ -369,9 +369,14 @@ export function Catalog() {
             totalProducts={
               filteredProducts.length
             }
+            resultsState={remoteError ? "error" : remoteLoading || !remoteReady ? "loading" : "ready"}
           />
+          {remoteError && <div className="catalog-data-state is-error" role="alert"><span className="eyebrow">CATÁLOGO NO DISPONIBLE</span><p>{remoteError}</p><button type="button" onClick={() => window.location.reload()}>Reintentar</button></div>}
+          {remoteLoading && <div className="catalog-data-state" role="status" aria-live="polite"><span className="eyebrow">COLECCIÓN FLOES</span><p>Consultando modelos y disponibilidad en Chopify…</p></div>}
+          {remoteReady && publishedProducts.length === 0 && <div className="catalog-data-state" role="status"><span className="eyebrow">COLECCIÓN FLOES</span><p>Nuestra colección está en preparación. Muy pronto podrás descubrir nuestros diseños.</p></div>}
           <div className="catalog-refinements">
-            {colors.length > 0 && <label>Color <select value={colorFilter} onChange={(event) => setColorFilter(event.target.value)}><option value="">Todos los colores</option>{colors.map((color) => <option key={color}>{color}</option>)}</select></label>}
+            {colors.length > 0 && <label>Color <select aria-label="Filtrar por color" value={colorFilter} onChange={(event) => setColorFilter(event.target.value)}><option value="">Todos los colores</option>{colors.map((color) => <option key={color}>{color}</option>)}</select></label>}
+            {sizes.length > 0 && <label>Talla <select aria-label="Filtrar por talla" value={sizeFilter} onChange={(event) => setSizeFilter(event.target.value)}><option value="">Todas las tallas</option>{sizes.map((size) => <option key={size}>{size}</option>)}</select></label>}
             <label className="availability-filter"><input type="checkbox" checked={availableOnly} onChange={(event) => setAvailableOnly(event.target.checked)} /> Disponibles para pedido</label>
           </div>
 
@@ -386,11 +391,7 @@ export function Catalog() {
               }
             />
 
-            <CatalogGrid
-              products={
-                filteredProducts
-              }
-            />
+            {!remoteLoading && !remoteError && remoteReady && publishedProducts.length > 0 && <CatalogGrid products={filteredProducts} />}
 
           </div>
 

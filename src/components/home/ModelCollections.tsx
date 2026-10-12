@@ -17,7 +17,7 @@ function CollectionSection({ eyebrow, title, products, id, tone = 0 }: {
   if (!products.length) return null;
   return <section className={`model-collection-section collection-${tone % 3}`} id={id}>
     <div className="container">
-      <header className="model-collection-heading">
+      <header className="model-collection-heading" data-scroll-item="heading">
         <div><span className="eyebrow">{eyebrow}</span><h2>{title}</h2></div>
         <Link to="/catalogo">Ver modelos</Link>
       </header>
@@ -46,9 +46,9 @@ export function MaterialsSection() {
   const products = useActiveProducts();
   const materials = [...new Set(products.flatMap((product) => [product.fabric, product.material]).filter((value): value is string => Boolean(value?.trim())))];
   if (!materials.length) return null;
-  return <section className="materials-section"><div className="container materials-layout">
-    <div><span className="eyebrow">NUESTRAS TELAS</span><h2>Materiales registrados para cada modelo.</h2></div>
-    <div className="materials-list">{materials.map((material, index) => <span key={material}><small>0{index + 1}</small>{material}</span>)}</div>
+  return <section className="materials-section" aria-labelledby="materials-title"><div className="container materials-layout">
+    <div data-scroll-item="heading"><span className="eyebrow">NUESTRAS TELAS</span><h2 id="materials-title">Materiales registrados para cada modelo.</h2></div>
+    <div className="materials-list">{materials.map((material, index) => <span key={material} data-scroll-item="material"><small>{String(index + 1).padStart(2, "0")}</small>{material}</span>)}</div>
   </div></section>;
 }
 

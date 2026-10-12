@@ -10,7 +10,7 @@ export function CatalogGrid({
 }: CatalogGridProps) {
   if (products.length === 0) {
     return (
-      <div className="catalog-empty">
+      <div className="catalog-empty" role="status">
         <span>No encontramos productos.</span>
 
         <p>
@@ -21,7 +21,7 @@ export function CatalogGrid({
   }
 
   return (
-    <div className="catalog-products-grid">
+    <div className="catalog-products-grid" role="region" aria-label="Productos del catálogo">
       {products.map((product) => (
         <ProductCard
           key={product.id}
