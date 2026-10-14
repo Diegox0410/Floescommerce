@@ -314,7 +314,7 @@ export function Cart() {
                 </span>
 
                 <small>
-                  Sin costo de envío
+                  Envío por confirmar
                 </small>
               </div>
 
