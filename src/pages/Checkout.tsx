@@ -79,6 +79,8 @@ export function Checkout() {
    * Admin → Configuración → Envíos.
    */
   const shippingCost: number | null = commerce.shippingEnabled && commerce.shippingMode === "fixed" ? commerce.shippingCost : null;
+  const shippingConfirmed = shippingCost !== null && Number.isFinite(shippingCost) && shippingCost >= 0;
+  const hasPaymentMethods = commerce.paymentMethods.transfer || (commerce.paymentMethods.cash && isGuayaquil);
 
   const total = subtotal + (shippingCost ?? 0);
 
@@ -167,6 +169,14 @@ export function Checkout() {
 
     if (!form.shipping.address.trim()) {
       nextErrors.address = "Ingresa la dirección.";
+    }
+
+    if (!shippingConfirmed) {
+      nextErrors.shippingCost = "La tarifa de entrega está pendiente. No se puede confirmar un pedido con el total provisional.";
+    }
+
+    if (!hasPaymentMethods) {
+      nextErrors.payment = "No hay métodos de pago configurados para Preview. El pedido no puede confirmarse.";
     }
 
     if (
@@ -478,6 +488,11 @@ export function Checkout() {
               </div>
 
               <div className="payment-options">
+                {!hasPaymentMethods && (
+                  <p role="alert">
+                    No hay métodos de pago configurados. El pedido permanece pendiente de configuración.
+                  </p>
+                )}
                 {commerce.paymentMethods.transfer && (
                   <button
                     type="button"
@@ -614,9 +629,9 @@ export function Checkout() {
                 <span>Envío</span>
 
                 <strong>
-                  {commerce.shippingEnabled
-                    ? "Servientrega · Por confirmar"
-                    : "Coordinar entrega"}
+                  {shippingConfirmed
+                    ? `$${shippingCost!.toFixed(2)} confirmado`
+                    : commerce.shippingEnabled ? "Servientrega · Por confirmar" : "Coordinar entrega · Por confirmar"}
                 </strong>
               </div>
             </div>
@@ -628,10 +643,11 @@ export function Checkout() {
             </div>
 
             {errors.submit && <p role="alert">{errors.submit}</p>}
+            {!shippingConfirmed && <p role="alert">La tarifa de entrega no está confirmada. No se puede crear el pedido con un total provisional.</p>}
             <button
               type="submit"
               className="checkout-submit"
-              disabled={processing}
+              disabled={processing || !shippingConfirmed || !hasPaymentMethods}
             >
               {processing ? "Procesando..." : "Confirmar pedido"}
 
