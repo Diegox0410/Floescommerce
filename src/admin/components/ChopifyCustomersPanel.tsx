@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ownerOperation } from "../../services/chopify/owner";
 import { record, text } from "../../utils/normalization";
 
@@ -28,7 +29,7 @@ export function ChopifyCustomersPanel() {
         <tbody>{customers.map((entry, index) => {
           const customer = record(entry);
           return <tr key={text(customer.id, `customer-${index}`)}>
-            <th scope="row">{text(customer.name, "Cliente")}</th>
+            <th scope="row"><Link to={`/admin/clientes/${encodeURIComponent(text(customer.id))}`}>{text(customer.name, "Cliente")}</Link></th>
             <td>{text(customer.phone, "—")}</td>
             <td>{text(customer.email, "—")}</td>
             <td>{text(customer.acquisitionSource, "—")}</td>

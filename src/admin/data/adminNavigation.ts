@@ -10,9 +10,11 @@ import {
   Megaphone,
   Settings,
   Store,
+  MessagesSquare,
 } from "lucide-react";
 export const adminNavigation = [
   { path: "", title: "Dashboard", icon: LayoutDashboard, group: "ESPACIO DE TRABAJO" },
+  { path: "conversaciones", title: "Conversaciones", icon: MessagesSquare, group: "VENTAS", description: "Historial y atención del cliente persistidos en Chopify.", features: ["Bandeja por cliente", "Intervención humana", "Contexto compartido"] },
   {
     path: "productos",
     title: "Productos",

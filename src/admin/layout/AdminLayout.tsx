@@ -361,7 +361,7 @@ export function AdminLayout() {
               </div>
   );
 
-  const usesChopifyOperations = pathname === "/admin" || pathname.startsWith("/admin/pedidos");
+  const usesChopifyOperations = pathname === "/admin" || ["/admin/pedidos", "/admin/clientes", "/admin/conversaciones", "/admin/productos"].some((path) => pathname === path || pathname.startsWith(`${path}/`)) || ["/admin/inventario", "/admin/finanzas", "/admin/analitica"].includes(pathname);
 
   return (
     <AdminAuthGuard>

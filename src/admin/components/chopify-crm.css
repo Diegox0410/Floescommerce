@@ -1,0 +1,14 @@
+.admin-crm-layout { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 3fr); gap: 18px; align-items: start; }
+.admin-crm-thread { display: grid; grid-template-columns: minmax(0, 2fr) minmax(200px, 1fr); gap: 18px; align-items: start; min-width: 0; }
+.admin-crm-list, .admin-crm-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.admin-crm-list-item { display: grid; gap: 6px; text-align: left; width: 100%; padding: 14px; color: inherit; font: inherit; border: 1px solid var(--admin-border); border-radius: 12px; background: white; cursor: pointer; overflow-wrap: anywhere; }
+.admin-crm-list-item[aria-pressed="true"] { outline: 2px solid var(--admin-primary, #704575); outline-offset: 2px; }
+.admin-crm-list-item:focus-visible { outline: 3px solid var(--admin-primary, #704575); outline-offset: 3px; }
+.admin-crm-message-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-crm-timeline .admin-card { padding: 16px; overflow-wrap: anywhere; }
+.admin-crm-attachment { display: block; width: 240px; max-width: 100%; height: auto; border-radius: 8px; }
+.admin-crm-thread .admin-toolbar { flex-wrap: wrap; }
+.admin-crm-composer { display: grid; gap: 10px; margin-top: 20px; }
+.admin-crm-composer textarea { width: 100%; box-sizing: border-box; padding: 12px; font: inherit; border: 1px solid var(--admin-border); border-radius: 10px; }
+@media (max-width: 1200px) { .admin-crm-thread { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .admin-crm-layout { grid-template-columns: minmax(0, 1fr); } .admin-crm-list { max-height: 360px; overflow-y: auto; } }

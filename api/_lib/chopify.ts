@@ -18,6 +18,14 @@ export const chopifyProtectionHeaders = (): Record<string, string> => {
   return secret ? { "x-vercel-protection-bypass": secret } : {};
 };
 
+/** Credentials stay on the FLOES server; Firebase user tokens are never forwarded. */
+export const chopifyOwnerHeaders = (): Record<string, string> => ({
+  Authorization: `Bearer ${requireEnvironment("CHOPIFY_OWNER_API_TOKEN_FLOES")}`,
+  "X-Chopify-Tenant-Id": TENANT_ID,
+  "X-Chopify-Access-Scope": "owner",
+  ...chopifyProtectionHeaders(),
+});
+
 export const publicCatalogUrl = () =>
   `${chopifyBaseUrl()}/api/catalog?tenant=${encodeURIComponent(TENANT_ID)}`;
 
