@@ -34,6 +34,10 @@ export interface ProductVariant {
   available?: boolean;
   availableQuantity?: number | null;
   sizeAvailability?: SizeAvailability[];
+  /** True only when the source explicitly verifies inventory for this variant. */
+  inventoryVerified?: boolean;
+  /** Official FLOES trouser option when this variant represents one. */
+  pantsType?: string;
   fulfillmentMode?: "STOCK" | "MADE_TO_ORDER" | "SERVICE" | "DIGITAL" | "HYBRID";
 }
 

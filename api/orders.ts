@@ -12,9 +12,9 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     const orderId = clean(queryValue(request.query?.id), 160);
     if (!orderId) return json(response, 400, { error: "order id is required" });
     try {
-      const data = await executeCommerce("getOrderStatus", { orderId });
+      const data = await executeCommerce("getOrderStatus", { orderId }) as Record<string, unknown> | undefined;
       return data
-        ? json(response, 200, { ok: true, tenantId, order: data })
+        ? json(response, 200, { ok: true, tenantId, order: data, ...(data.paymentMethod === "MANUAL_TRANSFER_TEST" && (data.shippingQuote as Record<string, unknown> | undefined)?.status === "ACCEPTED" ? { paymentInstructions: { type: "SYNTHETIC_TEST_ONLY", text: "No real transfer or bank account exists. Adjunta únicamente el comprobante ficticio de sandbox." } } : {}) })
         : json(response, 404, { error: "Pedido no encontrado." });
     } catch (error) {
       console.error("FLOES order status:", error instanceof Error ? error.message : "unknown");
@@ -69,6 +69,12 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     return json(response, 400, { error: "El pedido contiene cantidades o productos inválidos." });
   }
 
+  const paymentMethod = clean(body.paymentMethod, 40);
+  if (paymentMethod && paymentMethod !== "MANUAL_TRANSFER_TEST") return json(response, 400, { error: "Método de pago no habilitado." });
+  if (paymentMethod === "MANUAL_TRANSFER_TEST" && !(process.env.FLOES_ENABLE_SYNTHETIC_TRANSFER === "true" && (process.env.VERCEL_ENV === "preview" || process.env.NODE_ENV === "development"))) {
+    return json(response, 403, { error: "La transferencia sintética está deshabilitada fuera del sandbox local/Preview." });
+  }
+
   try {
     const identity = (await executeCommerce("resolveCustomerIdentity", {
       channel: "WEB",
@@ -82,13 +88,30 @@ export default async function handler(request: ApiRequest, response: ApiResponse
 
     const order = await executeCommerce(
       "createOrderDraft",
-      { customerId: identity.customerId, lines: normalizedLines },
+      { customerId: identity.customerId, lines: normalizedLines, ...(paymentMethod ? { paymentMethod } : {}) },
       { idempotencyKey: String(idempotencyKey) },
     );
+    const orderResult = order && typeof order === "object" ? order as Record<string, unknown> : {};
+    const orderId = typeof orderResult.orderId === "string" ? orderResult.orderId : "";
+    if (!orderId) throw new Error("Order identifier was not returned");
+    await executeCommerce("updateOrderDelivery", {
+      orderId,
+      customerId: identity.customerId,
+      deliveryAddress: {
+        name,
+        phone,
+        city: clean(shipping.city, 100),
+        province: clean(shipping.province, 100),
+        address: clean(shipping.address, 240),
+        reference: clean(shipping.reference, 240),
+      },
+    }, { idempotencyKey: `floes-web-address:${String(idempotencyKey)}` });
+    const current = await executeCommerce("getOrderStatus", { orderId });
     return json(response, 201, {
       ok: true,
       tenantId,
-      order,
+      order: { ...orderResult, ...(current && typeof current === "object" ? current as Record<string, unknown> : {}) },
+      ...(paymentMethod === "MANUAL_TRANSFER_TEST" ? { paymentInstructions: { type: "SYNTHETIC_TEST_ONLY", text: "Instrucciones ficticias: no realices ninguna transferencia. Cuando Owner confirme el total de envío, adjunta el comprobante de prueba desde esta página." } } : {}),
       receipt: {
         customer: { firstName: clean(customer.firstName, 80), lastName: clean(customer.lastName, 80), phone, email },
         shipping: {

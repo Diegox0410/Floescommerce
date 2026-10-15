@@ -87,6 +87,8 @@ const mapVariant = (value: unknown): ProductVariant | null => {
     available: variant.available === true,
     availableQuantity: quantity,
     sizeAvailability,
+    inventoryVerified: variant.inventoryVerified === true,
+    pantsType: text(variant.pantsType).trim() || undefined,
     fulfillmentMode: fulfillmentMode(variant.fulfillmentMode),
   };
 };
@@ -175,6 +177,7 @@ export const availableQuantityForSize = (variant: ProductVariant, size?: string)
 export const canPurchase = (product: Product, variant?: ProductVariant, size?: string) => {
   const mode=variant?.fulfillmentMode??product.fulfillmentMode;
   const sizeInventoryConfigured=variant?.sizeAvailability?.length;
+  if (variant && mode === "STOCK" && variant.inventoryVerified !== true) return false;
   const targetAvailable = variant
     ? variant.active && (mode==='STOCK'&&sizeInventoryConfigured
       ? size ? (sizeAvailabilityFor(variant,size)?.availableQuantity??0)>0 : variant.sizeAvailability!.some(entry=>entry.availableQuantity!==null&&entry.availableQuantity>0)
@@ -191,8 +194,11 @@ export const catalogPrice = (product: Product, variant?: ProductVariant) => {
 
 export const variantSizes = (variant: ProductVariant) => [...new Set([variant.size, ...(variant.sizes ?? [])].filter((size): size is string => Boolean(size)).map(size=>size.trim().toUpperCase()))];
 
-export const resolveVariant = (product: Product, color: string, size: string) => product.variants.find((variant) =>
+export const FLOES_PANTS_TYPES = ["Jogger", "Basta recta", "Basta ancha"] as const;
+
+export const resolveVariant = (product: Product, color: string, size: string, pantsType?: string) => product.variants.find((variant) =>
   variant.active && (!color || slugify(variant.color ?? "") === slugify(color)) &&
+  (!pantsType || slugify(variant.pantsType ?? "") === slugify(pantsType)) &&
   (!variantSizes(variant).length || variantSizes(variant).includes(size.trim().toUpperCase())),
 );
 

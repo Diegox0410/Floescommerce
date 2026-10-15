@@ -35,6 +35,22 @@ export async function requireFloesOwner(request: ApiRequest) {
   const ownerUid = process.env.FLOES_OWNER_UID?.trim();
   if (!projectId || !ownerUid) throw new Error("Owner authentication is not configured");
   const token = header(request.headers.authorization).replace(/^Bearer\s+/i, "");
+  const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST?.trim();
+  if (emulatorHost) {
+    if (!projectId.startsWith("demo-") || !/^(127\.0\.0\.1|localhost|\[::1\]):\d{1,5}$/.test(emulatorHost)) {
+      throw new Error("Firebase Auth Emulator is restricted to loopback and a demo project");
+    }
+    const response = await fetch(`http://${emulatorHost}/identitytoolkit.googleapis.com/v1/accounts:lookup?key=fake-api-key`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ idToken: token }),
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) throw new Error("Unauthorized");
+    const result = await response.json() as { users?: Array<{ localId?: string }> };
+    if (!result.users?.some(user => user.localId === ownerUid)) throw new Error("Unauthorized");
+    return ownerUid;
+  }
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Unauthorized");
 

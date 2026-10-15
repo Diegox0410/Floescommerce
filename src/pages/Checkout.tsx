@@ -45,7 +45,7 @@ const initialForm: CheckoutFormData = {
     reference: "",
   },
 
-  paymentMethod: "transfer",
+  paymentMethod: import.meta.env.VITE_FLOES_ENABLE_SYNTHETIC_TRANSFER_TEST === "true" ? "transfer-test" : "transfer",
 };
 
 export function Checkout() {
@@ -78,9 +78,9 @@ export function Checkout() {
    * Más adelante esto vendrá de:
    * Admin → Configuración → Envíos.
    */
-  const shippingCost: number | null = commerce.shippingEnabled && commerce.shippingMode === "fixed" ? commerce.shippingCost : null;
-  const shippingConfirmed = shippingCost !== null && Number.isFinite(shippingCost) && shippingCost >= 0;
-  const hasPaymentMethods = commerce.paymentMethods.transfer || (commerce.paymentMethods.cash && isGuayaquil);
+  const shippingCost: number | null = null;
+  const syntheticTransferEnabled = import.meta.env.VITE_FLOES_ENABLE_SYNTHETIC_TRANSFER_TEST === "true";
+  const hasPaymentMethods = syntheticTransferEnabled || commerce.paymentMethods.transfer || (commerce.paymentMethods.cash && isGuayaquil);
 
   const total = subtotal + (shippingCost ?? 0);
 
@@ -171,22 +171,22 @@ export function Checkout() {
       nextErrors.address = "Ingresa la dirección.";
     }
 
-    if (!shippingConfirmed) {
-      nextErrors.shippingCost = "La tarifa de entrega está pendiente. No se puede confirmar un pedido con el total provisional.";
-    }
-
     if (!hasPaymentMethods) {
       nextErrors.payment = "No hay métodos de pago configurados para Preview. El pedido no puede confirmarse.";
     }
 
     if (
-      form.paymentMethod ===
+        form.paymentMethod ===
         "transfer" &&
       !commerce.paymentMethods
         .transfer
     ) {
       nextErrors.payment =
         "La transferencia no está disponible en este momento.";
+    }
+
+    if (form.paymentMethod === "transfer-test" && !syntheticTransferEnabled) {
+      nextErrors.payment = "La transferencia sintética solo está disponible en Preview/local con la bandera de sandbox habilitada.";
     }
 
     if (
@@ -240,7 +240,7 @@ export function Checkout() {
           quantity,
           variantId: latestVariant?.id,
           variantSku: latestVariant?.sku,
-          variantLabel: latestVariant ? [latestVariant.color, size || latestVariant.size].filter(Boolean).join(" / ") : undefined,
+          variantLabel: latestVariant ? [latestVariant.color, latestVariant.pantsType, size || latestVariant.size].filter(Boolean).join(" / ") : undefined,
           size: size || latestVariant?.size,
           color: latestVariant?.color,
           measurement: latestVariant?.measurement,
@@ -409,7 +409,7 @@ export function Checkout() {
               </div>
 
               <p className="checkout-summary-note">
-                Los envíos nacionales se coordinan por Servientrega. El valor del envío se confirmará antes de completar la compra.
+                Solicitaremos una cotización de entrega y confirmaremos el total antes del pago.
               </p>
 
               <div className="checkout-fields checkout-fields-two">
@@ -493,7 +493,7 @@ export function Checkout() {
                     No hay métodos de pago configurados. El pedido permanece pendiente de configuración.
                   </p>
                 )}
-                {commerce.paymentMethods.transfer && (
+        {commerce.paymentMethods.transfer && (
                   <button
                     type="button"
                     className={
@@ -519,7 +519,16 @@ export function Checkout() {
                       {form.paymentMethod === "transfer" && (
                         <Check size={14} />
                       )}
+
                     </span>
+                  </button>
+                )}
+
+                {syntheticTransferEnabled && (
+                  <button type="button" className={form.paymentMethod === "transfer-test" ? "payment-option active" : "payment-option"} onClick={() => selectPayment("transfer-test")}>
+                    <div className="payment-option-icon"><CreditCard size={19} /></div>
+                    <div><strong>Transferencia sintética de prueba</strong><span>Sandbox aislado. No hay cuenta bancaria ni movimiento real.</span></div>
+                    <span className="payment-selector">{form.paymentMethod === "transfer-test" && <Check size={14} />}</span>
                   </button>
                 )}
 
@@ -607,7 +616,7 @@ export function Checkout() {
                       <span>{product.category}</span>
 
                       <strong>{product.name}</strong>
-                      {variant && <small>{[variant.color, size || variant.size].filter(Boolean).join(" / ")}</small>}
+                      {variant && <small>{[variant.color, variant.pantsType, size || variant.size].filter(Boolean).join(" / ")}</small>}
                     </div>
 
                     <div className="checkout-summary-product-price">
@@ -629,9 +638,7 @@ export function Checkout() {
                 <span>Envío</span>
 
                 <strong>
-                  {shippingConfirmed
-                    ? `$${shippingCost!.toFixed(2)} confirmado`
-                    : commerce.shippingEnabled ? "Servientrega · Por confirmar" : "Coordinar entrega · Por confirmar"}
+                  Cotización pendiente de Owner
                 </strong>
               </div>
             </div>
@@ -643,11 +650,10 @@ export function Checkout() {
             </div>
 
             {errors.submit && <p role="alert">{errors.submit}</p>}
-            {!shippingConfirmed && <p role="alert">La tarifa de entrega no está confirmada. No se puede crear el pedido con un total provisional.</p>}
             <button
               type="submit"
               className="checkout-submit"
-              disabled={processing || !shippingConfirmed || !hasPaymentMethods}
+              disabled={processing || !hasPaymentMethods}
             >
               {processing ? "Procesando..." : "Confirmar pedido"}
 
@@ -655,8 +661,7 @@ export function Checkout() {
             </button>
 
             <p className="checkout-summary-note">
-              El valor final del envío será confirmado antes de completar la
-              compra.
+              Confirma el pedido para solicitar el envío; el pago se habilita tras aceptar la cotización de Owner.
             </p>
           </aside>
         </form>

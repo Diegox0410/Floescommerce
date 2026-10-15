@@ -21,7 +21,8 @@ export function ProductDetail() {
   const variants = product?.variants.filter((variant) => variant.active) ?? [];
   const colors = [...new Set(variants.map((variant) => variant.color).filter((value): value is string => Boolean(value)))];
   const color = colors.find((value) => slugify(value) === slugify(params.get("color") ?? "")) ?? (colors.length === 1 ? colors[0] : "");
-  const possibleSizes = [...new Set(variants.filter((variant) => !color || variant.color === color).flatMap(variantSizes))];
+  const pantsType = params.get("pantalon") ?? "";
+  const possibleSizes = [...new Set(variants.filter((variant) => (!color || slugify(variant.color ?? "") === slugify(color)) && (!pantsType || slugify(variant.pantsType ?? "") === slugify(pantsType))).flatMap(variantSizes))];
   const size = possibleSizes.includes(params.get("talla") ?? "") ? params.get("talla")! : possibleSizes.length === 1 ? possibleSizes[0] : "";
   const select = (key: string, value: string) => {
     setParams((current) => {
@@ -30,7 +31,7 @@ export function ProductDetail() {
       return next;
     }, { replace: true });
   };
-  const selected = product ? resolveVariant(product, color, size) : undefined;
+  const selected = product ? resolveVariant(product, color, size, pantsType) : undefined;
   const colorVariant = variants.find((variant) => variant.color === color);
   const images = product ? editorialImagesForProduct(product.slug, color || undefined) : [];
   const image = images[0];
@@ -48,7 +49,7 @@ export function ProductDetail() {
       <Link to="/catalogo" className="product-back-link"><ChevronLeft size={16} />La colección</Link>
       <section className="product-detail-layout">
         <div className="product-gallery-wrap"><ProductGallery key={`${product.id}:${color}`} name={product.name} image={image} images={images} />{colorPhotoIsReference && <p className="product-photo-reference-note" role="note">Fotografía referencial del modelo. El tono exacto de {color} puede variar; consúltanos si necesitas confirmar el color.</p>}</div>
-        <div className="product-detail-content"><ProductInfo product={display} /><ProductPurchase key={product.id} product={product} color={color} size={size} onColorChange={(value) => select("color", value)} onSizeChange={(value) => select("talla", value)} onOpenSizeGuide={() => setSizeGuideOpen(true)} /></div>
+        <div className="product-detail-content"><ProductInfo product={display} /><ProductPurchase key={product.id} product={product} color={color} size={size} pantsType={pantsType} onColorChange={(value) => select("color", value)} onSizeChange={(value) => select("talla", value)} onPantsTypeChange={(value) => select("pantalon", value)} onOpenSizeGuide={() => setSizeGuideOpen(true)} /></div>
       </section>
       <section className="product-detail-sections">
         {(product.description || product.characteristics?.length) && <details open><summary>El diseño, en detalle</summary>{product.description && <p>{product.description}</p>}{Boolean(product.characteristics?.length) && <ul>{product.characteristics!.map((value) => <li key={value}>{value}</li>)}</ul>}</details>}

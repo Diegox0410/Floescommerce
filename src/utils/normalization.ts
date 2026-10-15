@@ -69,6 +69,8 @@ const normalizeVariants = (value: unknown): ProductVariant[] =>
         const availabilityStatus = availableQuantity === null ? "NOT_CONFIGURED" as const : availableQuantity > 0 ? "AVAILABLE" as const : "OUT_OF_STOCK" as const;
         return { size: text(size.size).trim().toUpperCase(), available: availableQuantity !== null && availableQuantity > 0, availableQuantity, availabilityStatus };
       }).filter((entry) => entry.size) : undefined,
+      inventoryVerified: item.inventoryVerified === true,
+      pantsType: text(item.pantsType).trim() || undefined,
       fulfillmentMode: ["STOCK", "MADE_TO_ORDER", "SERVICE", "DIGITAL", "HYBRID"].includes(text(item.fulfillmentMode)) ? text(item.fulfillmentMode) as ProductVariant["fulfillmentMode"] : undefined,
     };
   }).filter((variant) => variant.id && variant.sku);

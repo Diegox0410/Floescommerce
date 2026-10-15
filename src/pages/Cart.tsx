@@ -188,7 +188,7 @@ export function Cart() {
                             )}{" "}
                             por unidad
                           </p>
-                          {variant && <small>{[variant.color, size || variant.size].filter(Boolean).join(" / ")}</small>}
+                          {variant && <small>{[variant.color, variant.pantsType, size || variant.size].filter(Boolean).join(" / ")}</small>}
                         </div>
 
                         <button
@@ -331,12 +331,11 @@ export function Cart() {
 
                 <div>
                   <strong>
-                    Envíos por Servientrega
+                    Cotización de envío por Owner
                   </strong>
 
                   <span>
-                    El costo se confirma según
-                    provincia.
+                    La tarifa y el total se confirman antes del pago.
                   </span>
                 </div>
               </div>

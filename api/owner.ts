@@ -12,21 +12,25 @@ const allowed = new Set([
   "listProducts",
   "searchProducts",
   "approvePayment",
+  "setShippingQuote",
   "rejectPaymentProof",
   "startPreparation",
   "markReady",
   "dispatchOrder",
   "markDelivered",
+  "recordOrderFollowUp",
   "addCustomerNote",
   "resolveEscalation",
 ]);
 const mutations = new Set([
   "approvePayment",
+  "setShippingQuote",
   "rejectPaymentProof",
   "startPreparation",
   "markReady",
   "dispatchOrder",
   "markDelivered",
+  "recordOrderFollowUp",
   "addCustomerNote",
   "resolveEscalation",
 ]);
@@ -107,6 +111,8 @@ const safeInput = (operation: string, raw: unknown) => {
     return { query: clean(input.query, 120), limit: Number.isFinite(limit) ? Math.max(1, Math.min(200, Math.floor(limit))) : 200 };
   }
   if (operation === "addCustomerNote") return { customerId: clean(input.customerId), body: clean(input.body, 1000) };
+  if (operation === "setShippingQuote") return { orderId: clean(input.orderId), amountCents: Number(input.amountCents), expectedVersion: Number(input.expectedVersion) };
+  if (operation === "recordOrderFollowUp") return { orderId: clean(input.orderId), customerId: clean(input.customerId), outcome: clean(input.outcome), note: clean(input.note, 500) };
   if (operation === "resolveEscalation") return { escalationId: clean(input.escalationId), resolution: clean(input.resolution, 500) };
   if (["getOrderDetail", "startPreparation", "markReady", "markDelivered"].includes(operation)) {
     return { orderId: clean(input.orderId) };
@@ -127,6 +133,8 @@ const hasRequiredInput = (operation: string, input: Record<string, unknown>) => 
   if (["approvePayment", "rejectPaymentProof"].includes(operation)) {
     return has("paymentId", "proofId") && (operation !== "rejectPaymentProof" || has("reason"));
   }
+  if (operation === "setShippingQuote") return has("orderId") && Number.isSafeInteger(input.amountCents) && Number(input.amountCents) >= 0 && Number.isInteger(input.expectedVersion) && Number(input.expectedVersion) >= 0;
+  if (operation === "recordOrderFollowUp") return has("orderId", "customerId") && ["RECEIVED", "SATISFIED", "ISSUE", "HUMAN_REQUESTED"].includes(String(input.outcome));
   if (operation === "addCustomerNote") return has("customerId", "body");
   if (operation === "resolveEscalation") return has("escalationId", "resolution");
   return true;

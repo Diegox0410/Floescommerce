@@ -20,6 +20,35 @@ function previewReadProxy(env: Record<string, string>): Plugin {
 
         if (!isApi && !isAsset) return next()
 
+        const localApiBase = env.FLOES_LOCAL_SANDBOX_API_ENABLED === 'true' && /^http:\/\/(127\.0\.0\.1|localhost|\[::1\]):\d{1,5}$/.test(env.FLOES_LOCAL_SANDBOX_API_BASE_URL ?? '')
+          ? env.FLOES_LOCAL_SANDBOX_API_BASE_URL
+          : ''
+        if (isApi && localApiBase) {
+          try {
+            const bodyChunks: Buffer[] = []
+            if (!['GET', 'HEAD'].includes(request.method ?? 'GET')) {
+              for await (const chunk of request) bodyChunks.push(Buffer.from(chunk))
+            }
+            const upstreamUrl = new URL(`${pathname}${new URL(request.url ?? '/', 'http://localhost').search}`, localApiBase)
+            const headers = new Headers()
+            for (const name of ['accept', 'authorization', 'content-type', 'x-correlation-id', 'x-chopify-tenant-id']) {
+              const value = request.headers[name]
+              if (typeof value === 'string') headers.set(name, value)
+            }
+            const method = request.method ?? 'GET'
+            const upstream = await fetch(upstreamUrl, { method, headers, ...(bodyChunks.length ? { body: Buffer.concat(bodyChunks), duplex: 'half' } as RequestInit : {}), signal: AbortSignal.timeout(30_000) })
+            response.statusCode = upstream.status
+            for (const name of ['content-type', 'cache-control', 'content-disposition', 'x-content-type-options']) {
+              const value = upstream.headers.get(name)
+              if (value) response.setHeader(name, value)
+            }
+            response.end(Buffer.from(await upstream.arrayBuffer()))
+          } catch {
+            unavailable(response, 'El API sandbox local no está disponible. No se llamó a Preview ni Production.')
+          }
+          return
+        }
+
         if (request.method !== 'GET') {
           response.statusCode = 405
           response.setHeader('Allow', 'GET')

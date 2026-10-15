@@ -1,4 +1,4 @@
-export type PaymentMethod = "transfer" | "cash" | "whatsapp";
+export type PaymentMethod = "transfer" | "transfer-test" | "cash" | "whatsapp";
 export type CheckoutPaymentMethod = Exclude<PaymentMethod, "whatsapp">;
 export type PaymentStatus = "pending" | "confirmed" | "rejected" | "refunded";
 export type OrderStatus =
@@ -40,6 +40,9 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   customerId?: string;
+  chopifyCustomerId?: string;
+  shippingQuote?: { status: "REQUESTED" | "QUOTED" | "ACCEPTED"; amount?: { amount: number; currency: string }; version: number };
+  remoteTotalStatus?: "provisional" | "definitive";
   customer: CustomerData;
   shipping: ShippingData;
   items: OrderItem[];

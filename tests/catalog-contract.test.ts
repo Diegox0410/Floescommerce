@@ -52,7 +52,7 @@ test("one parent keeps color SKUs, real image, declared sizes and flat garment g
     ...base, price: { amount: 45, currency: "USD" }, pricingStatus: "READY", characteristics: ["Bolsillo lateral"], material: "Tela registrada",
     sizeGuide: { measurement: "FLAT_GARMENT_CM", instructions: "Medir una prenda extendida", blouse: [{ size: "M", measurementsCm: { pecho: 50 } }] },
     variants: [
-      { variantId: "vino", sku: "TEST-VINO", color: "Vino", price: { amount: 45, currency: "USD" }, promotionalPrice: { amount: 40, currency: "USD" }, pricingStatus: "READY", available: true, sizes: ["S", "M"], images: [{ url: "https://example.test/vino.jpg" }], fulfillmentMode: "STOCK", availableQuantity: 10 },
+      { variantId: "vino", sku: "TEST-VINO", color: "Vino", price: { amount: 45, currency: "USD" }, promotionalPrice: { amount: 40, currency: "USD" }, pricingStatus: "READY", available: true, inventoryVerified: true, sizes: ["S", "M"], images: [{ url: "https://example.test/vino.jpg" }], fulfillmentMode: "STOCK", availableQuantity: 10 },
       { variantId: "negro", sku: "TEST-NEGRO", color: "Negro", price: { amount: 47, currency: "USD" }, pricingStatus: "READY", available: false, sizes: ["M"], images: [{ url: "https://example.test/negro.jpg" }] },
     ],
   }]);
@@ -87,7 +87,7 @@ test("stock availability is derived independently for each normalized size", () 
     pricingStatus: "READY",
     variants: [{
       variantId: "dan-vino", sku: "FLOES-DAN-11", color: "Vino", price: { amount: 45, currency: "USD" },
-      pricingStatus: "READY", available: true, fulfillmentMode: "STOCK", sizes: ["XS", "S", "M", "L", "XL"],
+      pricingStatus: "READY", available: true, inventoryVerified: true, fulfillmentMode: "STOCK", sizes: ["XS", "S", "M", "L", "XL"],
       availableQuantity: 49,
       sizeAvailability: [
         { size: "xs", availableQuantity: 0 },
@@ -104,4 +104,17 @@ test("stock availability is derived independently for each normalized size", () 
   assert.equal(canPurchase(product, variant, "XS"), false);
   assert.equal(canPurchase(product, variant, "M"), true);
   assert.equal(canPurchase(product, variant), true);
+});
+
+test("pants type resolves only to its own backend variant", () => {
+  const [product] = mapChopifyCatalog([{
+    ...base,
+    variants: [
+      { variantId: "dan-vino-jogger", sku: "DAN-VINO-JOGGER", color: "Vino", pantsType: "Jogger", sizes: ["M"], fulfillmentMode: "MADE_TO_ORDER", available: true, price: { amount: 45 }, pricingStatus: "READY" },
+      { variantId: "dan-vino-recta", sku: "DAN-VINO-RECTA", color: "Vino", pantsType: "Basta recta", sizes: ["M"], fulfillmentMode: "MADE_TO_ORDER", available: true, price: { amount: 45 }, pricingStatus: "READY" },
+    ],
+  }]);
+  assert.equal(resolveVariant(product, "Vino", "M", "Jogger")?.id, "dan-vino-jogger");
+  assert.equal(resolveVariant(product, "Vino", "M", "Basta recta")?.id, "dan-vino-recta");
+  assert.equal(resolveVariant(product, "Vino", "M", "Basta ancha"), undefined);
 });

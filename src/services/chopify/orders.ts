@@ -9,7 +9,7 @@ export async function createChopifyOrder(draft: Order): Promise<Order> {
       idempotencyKey: `floes-web:${draft.id}`,
       customer: draft.customer,
       shipping: draft.shipping,
-      paymentMethod: draft.paymentMethod,
+      paymentMethod: draft.paymentMethod === "transfer-test" ? "MANUAL_TRANSFER_TEST" : draft.paymentMethod,
       lines: draft.items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
@@ -35,6 +35,9 @@ export async function createChopifyOrder(draft: Order): Promise<Order> {
     ...draft,
     id: orderId,
     customerId: text(remote.customerId) || undefined,
+    chopifyCustomerId: text(remote.customerId) || undefined,
+    shippingQuote: record(remote.shippingQuote) as Order["shippingQuote"],
+    remoteTotalStatus: text(remote.totalStatus) === "definitive" ? "definitive" : "provisional",
     subtotal: total.amount,
     shippingCost: null,
     total: total.amount,
