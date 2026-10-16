@@ -1,8 +1,9 @@
 import { executeCommerce, tenantId } from "./_lib/chopify.js";
-import { requireFloesOwner } from "./_lib/firebaseAuth.js";
+import { OwnerAuthError, requireFloesOwner } from "./_lib/firebaseAuth.js";
 import { json, parseBody, type ApiRequest, type ApiResponse } from "./_lib/http.js";
 
 const allowed = new Set([
+  "verifyOwnerAccess",
   "ownerDashboard",
   "getCatalogSnapshot",
   "listOrders",
@@ -152,9 +153,13 @@ export function createOwnerHandler(dependencies: OwnerHandlerDependencies = {}) 
   if (request.method !== "POST") return json(response, 405, { error: "Method not allowed" });
   try {
     await authorize(request);
-  } catch {
-    console.error("FLOES_OWNER_UNAUTHORIZED");
-    return json(response, 401, { error: "Unauthorized" });
+  } catch (error) {
+    const code = error instanceof OwnerAuthError ? error.code : "FLOES_OWNER_TOKEN_INVALID";
+    const status = code === "FLOES_OWNER_UID_NOT_ALLOWED" ? 403
+      : code === "FLOES_OWNER_CONFIG" || code === "FLOES_OWNER_PROJECT_MISMATCH" || code === "FLOES_OWNER_VERIFICATION_UNAVAILABLE" ? 503
+        : 401;
+    console.error("FLOES_OWNER_AUTH_FAILED", { code });
+    return json(response, status, { error: "Owner access could not be verified.", code });
   }
 
   let body: Record<string, unknown>;
@@ -165,6 +170,7 @@ export function createOwnerHandler(dependencies: OwnerHandlerDependencies = {}) 
   }
   const operation = clean(body.operation, 80);
   if (!allowed.has(operation)) return json(response, 403, { error: "Operation not allowed" });
+  if (operation === "verifyOwnerAccess") return json(response, 200, { ok: true, tenantId, data: { authorized: true } });
   const idempotencyKey = clean(body.idempotencyKey, 160);
   if (mutations.has(operation) && !/^[A-Za-z0-9:_-]{16,160}$/.test(idempotencyKey)) {
     return json(response, 400, { error: "Idempotency key is required" });

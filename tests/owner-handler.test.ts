@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createOwnerHandler } from "../api/owner.ts";
+import { OwnerAuthError } from "../api/_lib/firebaseAuth.ts";
 
 const response = () => {
   const result = { statusCode: 0, headers: {} as Record<string, string>, body: "" };
@@ -50,6 +51,40 @@ test("Owner catalog listing rejects unauthenticated callers before reading comme
   await handler({ method: "POST", headers: {}, body: { operation: "listProducts" } }, res);
   assert.equal(res.statusCode, 401);
   assert.equal(executed, false);
+});
+
+test("Owner access verification authenticates without running a commerce operation", async () => {
+  let executed = false;
+  const handler = createOwnerHandler({
+    authorize: async () => ({ uid: "owner" }),
+    execute: async () => { executed = true; return []; },
+  });
+  const res = response();
+  await handler({ method: "POST", headers: {}, body: { operation: "verifyOwnerAccess" } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(JSON.parse(res.body), { ok: true, tenantId: "tenant-floes", data: { authorized: true } });
+  assert.equal(executed, false);
+});
+
+test("Owner login exposes safe configuration and UID authorization categories", async () => {
+  for (const [error, expectedStatus, expectedCode] of [
+    [new OwnerAuthError("FLOES_OWNER_CONFIG"), 503, "FLOES_OWNER_CONFIG"],
+    [new OwnerAuthError("FLOES_OWNER_PROJECT_MISMATCH"), 503, "FLOES_OWNER_PROJECT_MISMATCH"],
+    [new OwnerAuthError("FLOES_OWNER_UID_NOT_ALLOWED"), 403, "FLOES_OWNER_UID_NOT_ALLOWED"],
+    [new OwnerAuthError("FLOES_OWNER_TOKEN_INVALID"), 401, "FLOES_OWNER_TOKEN_INVALID"],
+  ] as const) {
+    const handler = createOwnerHandler({
+      authorize: async () => { throw error; },
+      execute: async () => { throw new Error("Must not execute commerce"); },
+    });
+    const res = response();
+    await handler({ method: "POST", headers: {}, body: { operation: "verifyOwnerAccess" } }, res);
+    assert.equal(res.statusCode, expectedStatus);
+    assert.deepEqual(JSON.parse(res.body), {
+      error: "Owner access could not be verified.",
+      code: expectedCode,
+    });
+  }
 });
 
 test("Owner listCustomers uses the owner scope and excludes private customer metadata", async () => {

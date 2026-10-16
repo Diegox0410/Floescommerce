@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { LockKeyhole, LogIn } from "lucide-react";
 import { loginOwner } from "../../services/firebase/authService";
+import { ownerLoginMessage } from "../../services/firebase/ownerLogin";
 
 export function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -21,8 +22,8 @@ export function AdminLogin() {
 
     try {
       await loginOwner(email, password);
-    } catch {
-      setError("Correo, contraseña o permisos incorrectos.");
+    } catch (loginError) {
+      setError(ownerLoginMessage(loginError));
     } finally {
       setLoading(false);
     }
