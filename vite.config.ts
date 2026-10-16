@@ -2,6 +2,7 @@ import type { ServerResponse } from 'node:http'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { assertOwnerPreviewConfig } from './scripts/owner-preview-build-check.mjs'
 
 const unavailable = (response: ServerResponse, reason: string) => {
   response.statusCode = 503
@@ -166,6 +167,7 @@ function safePreviewUrl(value: string): URL | null {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  assertOwnerPreviewConfig({ ...env, ...process.env })
 
   return {
     plugins: [react(), tailwindcss(), previewReadProxy(env)],

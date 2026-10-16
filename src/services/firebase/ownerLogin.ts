@@ -1,6 +1,7 @@
 export type OwnerLoginFailureCode =
   | "OWNER_CONFIG_MISSING"
   | "OWNER_UID_UNAUTHORIZED"
+  | "OWNER_CLIENT_UID_MISMATCH"
   | "AUTH_PASSWORD_INCORRECT"
   | "AUTH_USER_NOT_FOUND"
   | "AUTH_INVALID_CREDENTIALS"
@@ -63,6 +64,8 @@ export function ownerLoginMessage(error: unknown): string {
       return "La cuenta Owner está deshabilitada en Firebase Authentication.";
     case "OWNER_UID_UNAUTHORIZED":
       return "La cuenta se autenticó, pero su UID no está autorizado para FLOES Preview.";
+    case "OWNER_CLIENT_UID_MISMATCH":
+      return "El servidor validó la sesión, pero el UID incorporado al frontend FLOES no coincide con la cuenta Owner.";
     case "OWNER_CONFIG_MISSING":
       return "Falta configurar el UID Owner en la candidata Preview de FLOES.";
     case "OWNER_SERVER_CONFIG":
@@ -95,8 +98,8 @@ export async function authenticateOwner<TUser extends OwnerLoginUser>(
   password: string,
   dependencies: OwnerLoginDependencies<TUser>,
 ): Promise<TUser> {
-  const expectedUid = dependencies.expectedUid?.trim();
-  if (!expectedUid) throw new OwnerLoginError("OWNER_CONFIG_MISSING");
+  const expectedUid = dependencies.expectedUid;
+  if (!expectedUid?.trim()) throw new OwnerLoginError("OWNER_CONFIG_MISSING");
 
   let user: TUser;
   try {
@@ -105,16 +108,16 @@ export async function authenticateOwner<TUser extends OwnerLoginUser>(
     throw classifyOwnerLoginError(error);
   }
 
-  if (user.uid !== expectedUid) {
-    try { await dependencies.signOut(); } catch { /* the rejected session is never accepted */ }
-    throw new OwnerLoginError("OWNER_UID_UNAUTHORIZED");
-  }
-
   try {
     await dependencies.verifyServerAccess?.(user);
   } catch (error) {
     try { await dependencies.signOut(); } catch { /* the rejected session is never accepted */ }
     throw classifyOwnerLoginError(error);
+  }
+
+  if (user.uid !== expectedUid) {
+    try { await dependencies.signOut(); } catch { /* the rejected session is never accepted */ }
+    throw new OwnerLoginError("OWNER_CLIENT_UID_MISMATCH");
   }
 
   return user;

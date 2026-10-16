@@ -38,7 +38,35 @@ test("authenticated but non-allowlisted UID signs out and is rejected", async ()
       return { user: { uid: "different-owner" } };
     },
     signOut: async () => { signedOut = true; },
-  }), (error: unknown) => error instanceof OwnerLoginError && error.code === "OWNER_UID_UNAUTHORIZED");
+  }), (error: unknown) => error instanceof OwnerLoginError && error.code === "OWNER_CLIENT_UID_MISMATCH");
+  assert.equal(signedOut, true);
+});
+
+test("server Owner allowlist is checked before the client UID comparison", async () => {
+  let verified = false;
+  let signedOut = false;
+  await assert.rejects(() => authenticateOwner("owner@example.test", "synthetic-password", {
+    expectedUid: "client-owner",
+    signIn: async () => ({ user: { uid: "authenticated-owner" } }),
+    signOut: async () => { signedOut = true; },
+    verifyServerAccess: async (user) => {
+      verified = true;
+      assert.equal(user.uid, "authenticated-owner");
+      throw new OwnerLoginError("OWNER_SERVER_UID_UNAUTHORIZED");
+    },
+  }), (error: unknown) => error instanceof OwnerLoginError && error.code === "OWNER_SERVER_UID_UNAUTHORIZED");
+  assert.equal(verified, true);
+  assert.equal(signedOut, true);
+});
+
+test("server-approved account still cannot pass a mismatched frontend UID", async () => {
+  let signedOut = false;
+  await assert.rejects(() => authenticateOwner("owner@example.test", "synthetic-password", {
+    expectedUid: "stale-client-owner",
+    signIn: async () => ({ user: { uid: "server-approved-owner" } }),
+    signOut: async () => { signedOut = true; },
+    verifyServerAccess: async () => undefined,
+  }), (error: unknown) => error instanceof OwnerLoginError && error.code === "OWNER_CLIENT_UID_MISMATCH");
   assert.equal(signedOut, true);
 });
 

@@ -48,9 +48,14 @@ async function certificates() {
 }
 
 export async function requireFloesOwner(request: ApiRequest) {
-  const projectId = process.env.FIREBASE_PROJECT_ID?.trim();
-  const ownerUid = process.env.FLOES_OWNER_UID?.trim();
-  if (!projectId || !ownerUid) throw new OwnerAuthError("FLOES_OWNER_CONFIG");
+  const rawProjectId = process.env.FIREBASE_PROJECT_ID;
+  const rawOwnerUid = process.env.FLOES_OWNER_UID;
+  if (!rawProjectId?.trim() || !rawOwnerUid?.trim()) throw new OwnerAuthError("FLOES_OWNER_CONFIG");
+  if (rawProjectId !== rawProjectId.trim() || rawOwnerUid !== rawOwnerUid.trim()) {
+    throw new OwnerAuthError("FLOES_OWNER_CONFIG");
+  }
+  const projectId = rawProjectId;
+  const ownerUid = rawOwnerUid;
   const token = header(request.headers.authorization).replace(/^Bearer\s+/i, "");
   if (!token) throw new OwnerAuthError("FLOES_OWNER_TOKEN_INVALID");
   const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST?.trim();
