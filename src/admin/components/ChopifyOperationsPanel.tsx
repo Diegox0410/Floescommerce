@@ -23,6 +23,12 @@ interface OwnerOrder {
   grandTotalCents: number | null;
   currency: string;
   customerName: string;
+  shippingQuote: {
+    status: string;
+    version: number;
+    amountCents: number | null;
+    currency: string;
+  };
 }
 
 interface PaymentReview {
@@ -91,6 +97,8 @@ const mapOrders = (
       const item = record(entry);
       const customer =
         record(item.customer);
+      const shippingQuote = record(item.shippingQuote);
+      const shippingAmount = record(shippingQuote.amount);
 
       return {
         id: text(item.id),
@@ -104,6 +112,12 @@ const mapOrders = (
           text(item.currency, "USD"),
         customerName:
           text(customer.name, "Cliente"),
+        shippingQuote: {
+          status: text(shippingQuote.status),
+          version: typeof shippingQuote.version === "number" && Number.isInteger(shippingQuote.version) ? shippingQuote.version : 0,
+          amountCents: typeof shippingAmount.amount === "number" && Number.isFinite(shippingAmount.amount) ? Math.round(shippingAmount.amount * 100) : null,
+          currency: text(shippingAmount.currency, text(item.currency, "USD")),
+        },
       };
     })
     .filter((order) => order.id);
@@ -320,6 +334,31 @@ export function ChopifyOperationsPanel({ orderId, onChanged }: { orderId?: strin
           ? operationError.message
           : "No se pudo actualizar el pedido.",
       );
+    } finally {
+      setWorking("");
+    }
+  };
+
+  const quoteShipping = async (order: OwnerOrder) => {
+    const raw = window.prompt(`Importe de envío en ${order.currency}. Escribe solo la cotización que el Owner autorizó.`)?.trim();
+    if (raw === undefined || raw === "") return;
+    const amount = Number(raw.replace(",", "."));
+    if (!Number.isFinite(amount) || amount < 0 || amount > 1_000_000) {
+      setError("Ingresa un importe de envío válido en la moneda del pedido.");
+      return;
+    }
+    setWorking(order.id);
+    setError("");
+    try {
+      await ownerOperation("setShippingQuote", {
+        orderId: order.id,
+        amountCents: Math.round(amount * 100),
+        expectedVersion: order.shippingQuote.version,
+      }, true);
+      await load();
+      onChanged?.();
+    } catch (operationError) {
+      setError(operationError instanceof Error ? operationError.message : "No se pudo guardar la cotización de envío.");
     } finally {
       setWorking("");
     }
@@ -573,6 +612,7 @@ export function ChopifyOperationsPanel({ orderId, onChanged }: { orderId?: strin
                   <th>
                     Preparación
                   </th>
+                  <th>Envío</th>
                   <th>Total</th>
                   <th>
                     Acción válida
@@ -611,10 +651,32 @@ export function ChopifyOperationsPanel({ orderId, onChanged }: { orderId?: strin
                       </td>
 
                       <td>
-                        {order.grandTotalCents === null ? "No informado" : money(order.grandTotalCents, order.currency)}
+                        {order.shippingQuote.status === "ACCEPTED"
+                          ? `Aceptado · ${order.shippingQuote.amountCents === null ? "importe no informado" : money(order.shippingQuote.amountCents, order.shippingQuote.currency)}`
+                          : order.shippingQuote.status === "QUOTED"
+                            ? `Esperando aceptación · ${order.shippingQuote.amountCents === null ? "importe no informado" : money(order.shippingQuote.amountCents, order.shippingQuote.currency)}`
+                            : order.shippingQuote.status === "REQUESTED"
+                              ? "Cotización solicitada"
+                              : "No aplica"}
                       </td>
 
                       <td>
+                        {order.grandTotalCents === null ? "No informado" : money(order.grandTotalCents, order.currency)}
+                        {order.shippingQuote.status !== "ACCEPTED" && order.shippingQuote.status !== "" && <small> · provisional</small>}
+                      </td>
+
+                      <td>
+                        {["REQUESTED", "QUOTED"].includes(order.shippingQuote.status) && (
+                          <button
+                            type="button"
+                            className="admin-button"
+                            disabled={working === order.id}
+                            onClick={() => void quoteShipping(order)}
+                          >
+                            {order.shippingQuote.status === "QUOTED" ? "Actualizar cotización" : "Fijar cotización"}
+                          </button>
+                        )}
+
                         {order.paymentStatus ===
                           "PAID" &&
                           order.fulfillmentStatus ===
