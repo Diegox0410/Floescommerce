@@ -16,6 +16,6 @@ if (assertOwnerPreviewConfig(process.env)) {
       return false;
     }
   });
-  if (!valid) throw new Error("FLOES Owner Preview build rejected: compiled Owner UID or Firebase sandbox project did not match the configured values.");
-  console.log("FLOES candidate Preview build check passed; compiled Owner UID and Firebase sandbox project match the branch configuration.");
+  if (!valid) throw new Error("FLOES Owner Preview build rejected: compiled Owner identity or Firebase Web SDK config did not match the sandbox Preview variables.");
+  console.log("FLOES candidate Preview build check passed; compiled Owner identity and six Firebase Web SDK fields match the sandbox Preview configuration.");
 }
